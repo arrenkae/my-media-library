@@ -1,5 +1,6 @@
 import express from "express";
 import cors from 'cors';
+import path from 'path';
 import dotenv from 'dotenv';
 import users_router from "./routes/users.routes.js";
 import media_router from "./routes/media.routes.js";
@@ -19,3 +20,9 @@ app.listen(process.env.PORT || 3001, () => {
 
 app.use('/users', users_router);
 app.use('/media', media_router);
+
+app.use(express.static(path.join(__dirname, "/client/build")));
+
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "./client/build", "index.html"));
+  });
