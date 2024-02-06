@@ -17,7 +17,7 @@ const LoginRegister = ({page}) => {
         e.preventDefault();
         if (page === 'Login') {
             try {
-                const response = await axios.post('http://localhost:3001/users/login', {
+                const response = await axios.post('/users/login', {
                     username: usernameRef.current.value,
                     password: passwordRef.current.value
                 });
@@ -33,7 +33,7 @@ const LoginRegister = ({page}) => {
         }
         else {
             try {
-                const response = await axios.post('http://localhost:3001/users/register', {
+                const response = await axios.post('/users/register', {
                     username: usernameRef.current.value,
                     password: passwordRef.current.value
                 });

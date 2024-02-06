@@ -35,46 +35,16 @@ export const login = async(req, res) => {
             username: row[0].username
         }
 
-        const accesstoken = jwt.sign({ user }, secret, {
+        const token = jwt.sign({ user }, secret, {
             expiresIn: '1h',
         });
-        const refreshtoken = jwt.sign({user }, secret, {
-            expiresIn: '1d',
-        });
 
-        res
-        .cookie('refreshtoken', refreshtoken, {
-            httpOnly: true,
-            sameSite: 'strict'
-        })
-        .header('Authorization', accesstoken)
-        .status(200).json({ token: accesstoken, user, msg: 'Login successful' });
+        res.cookie('token', token, { httpOnly: true });
+        res.status(200).json({token, msg: 'Login successful'});
 
     } catch (error) {
         console.log('login=>', error);
         res.status(404).json({msg: 'Unable to login'});
-    }
-}
-
-export const refresh = async(req, res) => {
-    const refreshtoken = req.cookies.refreshtoken;
-    if (!refreshtoken) {
-        res.status(401).json({msg: 'No refresh token provided'});
-    }
-
-    const secret = process.env.ACCESS_TOKEN_SECRET;
-
-    try {
-        const decoded = jwt.verify(refreshtoken, secret);
-        const accesstoken = jwt.sign({ user: decoded.user }, secret, {
-            expiresIn: '1h',
-        });
-        res
-        .header('Authorization', accesstoken)
-        .status(200).json({ user: decoded.user, msg: 'Token refreshed' });
-
-    } catch (error) {
-        res.status(400).json({msg: 'Ivalid refresh token'});
     }
 }
 

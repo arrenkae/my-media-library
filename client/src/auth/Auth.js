@@ -12,22 +12,12 @@ const Auth = (props) => {
 
     const verify = async() => {
         try {
-            const response = await axios.get('http://localhost:3001/users/verify', {
+            const response = await axios.get(`/users/verify`, {
                 headers: {
-                    'authorization': token ? token : ''
+                    'x-access-token': token ? token : ''
                 }
             })
-            if (response.status === 200) {
-                setRedirect(true)
-            } else {
-                try {
-                    const response = await axios.get('http://localhost:3001/users/refresh');
-                    if (response.status === 200) setRedirect(true);
-                } catch (error) {
-                    setRedirect(false);
-                    console.log(error);
-                }
-            };
+            if (response.status === 200) setRedirect(true);
         } catch (error) {
             setRedirect(false);
             console.log(error);

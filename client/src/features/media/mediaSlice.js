@@ -1,9 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 
+const API_KEY = process.env.REACT_APP_API_KEY;
+
 const initialState = {
     library: [],
     search: [],
+    media: {},
     load: 'idle',
     type: ''
 };
@@ -14,7 +17,7 @@ export const searchMedia = createAsyncThunk("media/fetch", async(query) => {
     url: `https://api.themoviedb.org/3/search/tv?query=${query}&include_adult=false&language=en-US&page=1`,
     headers: {
       accept: 'application/json',
-      Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyN2RjNzg4Mjg0MjNkZDkzM2Q0ZWFkOTdkYzA1ZjBkYSIsInN1YiI6IjY1YzE0MzFiZmM2NTM4MDE3Y2VlOGM3OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RbCKlCb9IOjvLWdw_RadPsKcVYd-aX5zhd8hWa0TNng'
+      Authorization: `Bearer ${API_KEY}`
     }
   });
   return response.data.results;
@@ -26,29 +29,29 @@ export const fetchMediaDetails = createAsyncThunk("media/details", async(apiId) 
     url: `https://api.themoviedb.org/3/tv/${apiId}?language=en-US`,
     headers: {
       accept: 'application/json',
-      Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyN2RjNzg4Mjg0MjNkZDkzM2Q0ZWFkOTdkYzA1ZjBkYSIsInN1YiI6IjY1YzE0MzFiZmM2NTM4MDE3Y2VlOGM3OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RbCKlCb9IOjvLWdw_RadPsKcVYd-aX5zhd8hWa0TNng'
+      Authorization: `Bearer ${API_KEY}`
     }
   });
   return response.data;
 });
 
 export const userMedia = createAsyncThunk("media/library", async() => {
-  const response = await axios.get('http://localhost:3001/media/tv');
+  const response = await axios.get('/media/tv');
   return response.data;
 });
 
-export const addTVShow = createAsyncThunk("media/add", async(type, media) => {
-  const response = await axios.post(`http://localhost:3001/media/add/${type}`, media);
+export const addMedia = createAsyncThunk("media/add", async(type, media) => {
+  const response = await axios.post(`/media/add/${type}`, media);
   return response.data;
 });
 
-export const updateTVShow = createAsyncThunk("media/update", async(id, media) => {
-  const response = await axios.put(`http://localhost:3001/media/update/${id}`, media);
+export const updateMedia = createAsyncThunk("media/update", async(id, media) => {
+  const response = await axios.put(`/media/update/${id}`, media);
   return response.data;
 });
 
-export const deleteTVShow = createAsyncThunk("media/delete", async(id, media) => {
-  const response = await axios.put(`http://localhost:3001/media/delete/${id}`, media);
+export const deleteMedia = createAsyncThunk("media/delete", async(id, media) => {
+  const response = await axios.put(`/media/delete/${id}`, media);
   return response.data;
 });
 
@@ -97,7 +100,7 @@ const TVshowSlice = createSlice({
     });
     builder.addCase(fetchMediaDetails.fulfilled, (state, action) => {
       state.load = 'succeded';
-      state.search = action.payload;
+      state.media = action.payload;
     });
     builder.addCase(fetchMediaDetails.rejected, (state, action) => {
         state.load = 'failed';

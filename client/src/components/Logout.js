@@ -10,7 +10,7 @@ const Logout = (props) => {
 
     const logout = async() => {
         try {
-            const response = await axios.get('http://localhost:3001/users/logout', {
+            const response = await axios.get('/logout', {
             })
             if (response.status === 200) {
                 setToken('');
