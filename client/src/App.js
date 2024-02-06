@@ -11,9 +11,10 @@ export const AuthContext = createContext();
 
 function App() {
   const [token, setToken] = useState();
+  const [user, setUser] = useState();
 
   return (
-    <AuthContext.Provider value={{token, setToken}}>
+    <AuthContext.Provider value={{token, setToken, user, setUser}}>
       <div className="App">
         <header className="App-header">
           <Nav />

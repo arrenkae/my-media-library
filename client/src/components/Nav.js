@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
+import Auth from '../auth/Auth';
 
 const Nav = (props) => {
     return (
-        <ul>
-            <li><Link to='/login'>Login</Link></li>
-            <li><Link to='/profile'>Profile</Link></li>
-        </ul>
+        <>
+            <Link className="App-link" to='/login'>Login</Link>
+            <Link className="App-link" to='/profile'>Profile</Link>
+        </>
     );
 };
 

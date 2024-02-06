@@ -1,11 +1,12 @@
 import express from 'express';
-import { register, login, updateUser, deleteUser } from '../controllers/users.controllers.js';
+import { register, login, refresh, updateUser, deleteUser } from '../controllers/users.controllers.js';
 import { verifytoken } from '../middlewares/verifytoken.js';
 
 const users_router = express.Router();
 
 users_router.post('/register', register);
 users_router.post('/login', login);
+users_router.post('/refresh', refresh);
 users_router.put('/update', verifytoken, updateUser);
 users_router.delete('/delete', verifytoken, deleteUser);
 

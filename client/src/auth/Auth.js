@@ -11,21 +11,30 @@ const Auth = (props) => {
     }, [])
 
     const verify = async() => {
-        console.log(token);
         try {
             const response = await axios.get('http://localhost:3001/users/verify', {
                 headers: {
-                    'x-access-token': token ? token : ''
+                    'authorization': token ? token : ''
                 }
             })
-            if (response.status === 200) setRedirect(true);
+            if (response.status === 200) {
+                setRedirect(true)
+            } else {
+                try {
+                    const response = await axios.get('http://localhost:3001/users/refresh');
+                    if (response.status === 200) setRedirect(true);
+                } catch (error) {
+                    setRedirect(false);
+                    console.log(error);
+                }
+            };
         } catch (error) {
             setRedirect(false);
             console.log(error);
         }
     }
 
-    return redirect ? props.children : <>Not authorized</>
+    return redirect ? props.children : ''
 }
 
 export default Auth;

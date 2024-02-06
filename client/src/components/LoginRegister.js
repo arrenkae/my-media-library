@@ -10,7 +10,7 @@ const LoginRegister = ({page}) => {
     const usernameRef = useRef(null);
     const passwordRef = useRef(null);
 
-    const {setToken} = useContext(AuthContext);
+    const {setToken, setUser} = useContext(AuthContext);
     const navigate = useNavigate();
 
     const loginregister = async(e) => {
@@ -23,6 +23,7 @@ const LoginRegister = ({page}) => {
                 });
                 if(response.status = 200) {
                     setToken(response.data.token);
+                    setUser(response.data.user);
                     navigate('/profile');
                 }
             } catch (error) {
