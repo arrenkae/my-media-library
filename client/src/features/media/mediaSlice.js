@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {current } from '@reduxjs/toolkit'
 import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -32,7 +33,7 @@ export const saveMedia = createAsyncThunk("media/save", async(media) => {
 });
 
 export const deleteMedia = createAsyncThunk("media/delete", async(id) => {
-  const response = await axios.put(`${BASE_URL}/media/delete/${id}`);
+  const response = await axios.delete(`${BASE_URL}/media/delete/${id}`);
   return response.data;
 });
 
@@ -66,17 +67,23 @@ const mediaSlice = createSlice({
     });
     builder.addCase(fetchMedia.fulfilled, (state, action) => {
       state.load = 'succeded';
-      state.media = ({...state.media, 
+      const data = {
         api_id: action.payload.id,
         title: action.payload.name,
         type: 'tv',
         image: `https://image.tmdb.org/t/p/w200${action.payload.poster_path}`,
         description: action.payload.overview,
-        released: action.payload.status != 'In Production',
+        released: action.payload.status !== 'In Production',
         progress_max: action.payload.number_of_episodes,
         release_date: action.payload.first_air_date,
         update_date: action.payload.last_air_date
-      });
+      };
+      const oldMedia = state.library.find(element => element.api_id === action.payload.id);
+      if (oldMedia) {
+        state.media = {...oldMedia, ...data};
+      } else {
+        state.media = data;
+      }
     });
     builder.addCase(fetchMedia.rejected, (state, action) => {
         state.load = 'failed';
@@ -96,9 +103,8 @@ const mediaSlice = createSlice({
     });
     builder.addCase(saveMedia.fulfilled, (state, action) => {
       state.load = 'succeded';
-      const existingMedia = state.library.find(media => media.id === action.payload.id);
-      if (existingMedia) {
-        state.library = state.library.map(media => media.id === action.payload.id ? {...media, ...action.payload} : media)
+      if (state.library.some(element => element.id === action.payload.id)) {
+        state.library = state.library.map(element => element.id === action.payload.id ? {...element, ...action.payload} : element)
       } else {
         state.library.push(action.payload);
       }

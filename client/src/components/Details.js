@@ -1,18 +1,28 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { saveMedia, resetMedia } from "../features/media/mediaSlice";
+import { saveMedia, resetMedia, fetchMedia } from "../features/media/mediaSlice";
 import { AuthContext } from '../App';
 
-const Details = () => {
-    const media = useSelector(state => state.media.media);
+const Details = (props) => {
+    const media = useSelector(state => state.media.media)
     const {user} = useContext(AuthContext);
-    const [status, setStatus] = useState(media.status ? media.status : 'Backlog');
-    const [progress, setProgress] = useState(media.progress ? media.progress : 0);
-    const [rating, setRating] = useState(media.rating ? media.rating : 0);
-    const [errorMsg, setErrorMsg] = useState();
+    const [status, setStatus] = useState('Backlog');
+    const [progress, setProgress] = useState(0);
+    const [rating, setRating] = useState(0);
     const loadStatus = useSelector(state => state.media.load);
     
     const dispatch = useDispatch();
+
+    useEffect(()=>{
+        if (media.api_id) dispatch(fetchMedia(media.api_id));
+    }, [])
+
+    useEffect(()=>{
+        if (media.status) setStatus(media.status);
+        if (media.progress) setProgress(media.progress);
+        if (media.rating) setRating(media.rating);
+    }, [media])
+
 
     const releasedOptions =
         <>
@@ -29,41 +39,32 @@ const Details = () => {
         <p>Rating: <input type="number" name="rating" onChange={(e) => setRating(e.target.value)} min="1" max="10" value={rating} /><br /></p>
         </>
 
-    const add = async() => {
+    const save = () => {
         dispatch(saveMedia({...media,
             user_id: user.id,
             status,
             progress,
             rating
         }));
-        if (loadStatus === 'succeded') {
-            dispatch(resetMedia())
-        } else if (loadStatus === 'failed') {
-            showError('Something went wrong');
-        };
+        dispatch(resetMedia());
     }
 
-    const showError = (message) => {
-        setErrorMsg(message);
-        setTimeout(() => { setErrorMsg('') }, 3000);
-    }
-
-    return (
+    return  (
         <div>
             <h2>{media.title}</h2>
             <img src={media.image} alt={media.title + ' poster'} />
             <p>{media.description}</p>
             <h5>{ media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'In production' }</h5>
-            { media.update_date ? <h5>Latest release: {media.update_date}</h5> : '' }
-            <select name="status" onChange={(e) => setStatus(e.target.value)}>
+            { media.update_date ? <h5>Latest release: {media.update_date}</h5> : null }
+            <select name="status" onChange={(e) => setStatus(e.target.value)} value={status}>
                 <option value='Backlog'>Backlog</option>
-                { media.released ? releasedOptions : '' }
+                { media.released ? releasedOptions : null }
             </select>
-            { media.released ? releasedValues : '' }
-            <button onClick={add}>Save</button>
-            <div className="errorMsg">{errorMsg}</div>
+            { media.released ? releasedValues : null }
+            <button onClick={save}>Save</button>
+            <div className="errorMsg">{ loadStatus === 'failed' ? 'Something went wrong' : null }</div>
         </div>
     );
 };
 
-export default Details;
+export default memo(Details);

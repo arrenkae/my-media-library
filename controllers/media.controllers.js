@@ -13,11 +13,10 @@ export const getUserMedia = async(req, res) => {
 
 export const saveMedia = async(req, res) => {
     const media = req.body;
-    console.log(req.body)
 
     try {
         const row = await _saveMedia(media);
-        res.status(201).json(row);
+        res.status(201).json(row[0]);
     } catch (error) {
         console.log('saveMedia=>', error);
         res.status(404).json({msg: 'Unable to save media'});

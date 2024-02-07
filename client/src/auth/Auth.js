@@ -22,7 +22,7 @@ const Auth = (props) => {
             if (response.status === 200) setRedirect(true);
         } catch (error) {
             setRedirect(false);
-            console.log(error.message);
+            console.log(error.response.data.msg ? error.response.data.msg : error.message);
         }
     }
 
