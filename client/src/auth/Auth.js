@@ -2,6 +2,8 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from '../App';
 
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 const Auth = (props) => {
     const [redirect, setRedirect] = useState(false);
     const {token} = useContext(AuthContext);
@@ -12,7 +14,7 @@ const Auth = (props) => {
 
     const verify = async() => {
         try {
-            const response = await axios.get(`/users/verify`, {
+            const response = await axios.get(`${BASE_URL}/users/verify`, {
                 headers: {
                     'x-access-token': token ? token : ''
                 }

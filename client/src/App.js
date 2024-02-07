@@ -4,6 +4,7 @@ import Nav from './components/Nav';
 import LoginRegister from './components/LoginRegister';
 import Profile from './components/Profile';
 import Logout from './components/Logout';
+import Search from './components/Search';
 import Auth from './auth/Auth';
 import './App.css';
 
@@ -23,7 +24,8 @@ function App() {
           <Route path='/login' element={<LoginRegister page={'Login'}/>} />
           <Route path='/register' element={<LoginRegister page={'Register'}/>} />
           <Route path='/profile' element={<Auth><Profile/></Auth>} />
-          <Route path='/logout' element={<Logout/>} />
+          <Route path='/search' element={<Search />} />
+          <Route path='/logout' element={<Logout />} />
         </Routes>
       </div>
     </AuthContext.Provider>

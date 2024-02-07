@@ -4,13 +4,15 @@ import { AuthContext } from '../App';
 
 import axios from "axios";
 
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 const Logout = (props) => {
     const navigate = useNavigate();
     const {token, setToken} = useContext(AuthContext);
 
     const logout = async() => {
         try {
-            const response = await axios.get('/logout', {
+            const response = await axios.get(`${BASE_URL}/users/logout`, {
             })
             if (response.status === 200) {
                 setToken('');

@@ -5,6 +5,8 @@ import axios from 'axios';
 
 import { AuthContext } from "../App";
 
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 const LoginRegister = ({page}) => {
     const [errorMsg, setErrorMsg] = useState();
     const usernameRef = useRef(null);
@@ -15,12 +17,14 @@ const LoginRegister = ({page}) => {
 
     const loginregister = async(e) => {
         e.preventDefault();
+        console.log(process.env);
         if (page === 'Login') {
             try {
-                const response = await axios.post('/users/login', {
+                const response = await axios.post(`${BASE_URL}/users/login`, {
                     username: usernameRef.current.value,
                     password: passwordRef.current.value
                 });
+                console.log(response);
                 if(response.status = 200) {
                     setToken(response.data.token);
                     setUser(response.data.user);
@@ -33,7 +37,7 @@ const LoginRegister = ({page}) => {
         }
         else {
             try {
-                const response = await axios.post('/users/register', {
+                const response = await axios.post(`${BASE_URL}/users/register`, {
                     username: usernameRef.current.value,
                     password: passwordRef.current.value
                 });
