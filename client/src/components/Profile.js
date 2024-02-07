@@ -1,5 +1,6 @@
 import {useContext} from 'react';
 import { AuthContext } from '../App';
+import Library from './Library';
 import Logout from './Logout';
 
 const Home = (props) => {
@@ -10,6 +11,7 @@ const Home = (props) => {
             <h1>Profile</h1>
             <h2>Welcome, {user.username}!</h2>
             <Logout />
+            <Library />
         </>
     );
 };

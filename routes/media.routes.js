@@ -1,12 +1,10 @@
 import express from 'express';
-import { getUserMedia, addMedia, updateMedia, deleteMedia } from '../controllers/media.controllers.js';
-import { verifytoken } from '../middlewares/verifytoken.js';
+import { getUserMedia, saveMedia, deleteMedia } from '../controllers/media.controllers.js';
 
 const media_router = express.Router();
 
-media_router.get('/:type', verifytoken, getUserMedia);
-media_router.post('/add/:type', verifytoken, addMedia);
-media_router.post('/update/:id', verifytoken, updateMedia);
-media_router.post('/delete/:id', verifytoken, deleteMedia);
+media_router.get('/:user_id', getUserMedia);
+media_router.post('/save', saveMedia);
+media_router.post('/delete/:id', deleteMedia);
 
 export default media_router;

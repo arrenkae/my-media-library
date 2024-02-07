@@ -24,7 +24,7 @@ function App() {
           <Route path='/login' element={<LoginRegister page={'Login'}/>} />
           <Route path='/register' element={<LoginRegister page={'Register'}/>} />
           <Route path='/profile' element={<Auth><Profile/></Auth>} />
-          <Route path='/search' element={<Search />} />
+          <Route path='/search' element={<Auth><Search /></Auth>} />
           <Route path='/logout' element={<Logout />} />
         </Routes>
       </div>

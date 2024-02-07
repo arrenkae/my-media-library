@@ -11,33 +11,24 @@ const initialState = {
     load: 'idle'
 };
 
-export const searchMedia = createAsyncThunk("media/fetch", async(query) => {
+export const searchMedia = createAsyncThunk("media/search", async(query) => {
   const response = await axios.get(`https://api.themoviedb.org/3/search/tv?query=${query}&api_key=${API_KEY}`);
   return response.data.results;
 });
 
-export const fetchMediaDetails = createAsyncThunk("media/details", async(apiId) => {
+export const fetchMedia = createAsyncThunk("media/fetch", async(apiId) => {
   const response = await axios.get(`https://api.themoviedb.org/3/tv/${apiId}?api_key=${API_KEY}`);
   return response.data;
 });
 
-export const userMedia = createAsyncThunk("media/library", async() => {
-  const response = await axios.get(`${BASE_URL}/media/tv`);
+export const userMedia = createAsyncThunk("media/library", async(user_id) => {
+  const response = await axios.get(`${BASE_URL}/media/${user_id}`);
   return response.data;
 });
 
-export const addMedia = createAsyncThunk("media/add", async(userId, type, media) => {
-  if (Object.keys(media).length > 0) {
-    const response = await axios.post(`${BASE_URL}/media/add/${type}`, media);
-    return response.data;
-  }
-});
-
-export const updateMedia = createAsyncThunk("media/update", async(id, media) => {
-  if (Object.keys(media).length > 0) {
-    const response = await axios.put(`${BASE_URL}/media/update/${id}`, media);
-    return response.data;
-  }
+export const saveMedia = createAsyncThunk("media/save", async(media) => {
+  const response = await axios.post(`${BASE_URL}/media/save`, media);
+  return response.data;
 });
 
 export const deleteMedia = createAsyncThunk("media/delete", async(id) => {
@@ -51,7 +42,13 @@ const mediaSlice = createSlice({
   reducers: {
     resetSearch: (state, action) => {
       state.search = [];
-    }
+    },
+    resetMedia: (state, action) => {
+      state.media = {};
+    },
+    editMedia: (state, action) => {
+      state.media = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(searchMedia.pending, (state, action) => {
@@ -64,26 +61,24 @@ const mediaSlice = createSlice({
     builder.addCase(searchMedia.rejected, (state, action) => {
         state.load = 'failed';
     });
-    builder.addCase(fetchMediaDetails.pending, (state, action) => {
+    builder.addCase(fetchMedia.pending, (state, action) => {
       state.load = 'loading';
     });
-    builder.addCase(fetchMediaDetails.fulfilled, (state, action) => {
+    builder.addCase(fetchMedia.fulfilled, (state, action) => {
       state.load = 'succeded';
-      state.media = {
-        title: action.payload.original_name,
+      state.media = ({...state.media, 
+        api_id: action.payload.id,
+        title: action.payload.name,
         type: 'tv',
         image: `https://image.tmdb.org/t/p/w200${action.payload.poster_path}`,
         description: action.payload.overview,
-        status: null,
-        released: !action.payload.in_production,
-        progress: null,
+        released: action.payload.status != 'In Production',
         progress_max: action.payload.number_of_episodes,
-        rating: null,
         release_date: action.payload.first_air_date,
         update_date: action.payload.last_air_date
-      }
+      });
     });
-    builder.addCase(fetchMediaDetails.rejected, (state, action) => {
+    builder.addCase(fetchMedia.rejected, (state, action) => {
         state.load = 'failed';
     });
     builder.addCase(userMedia.pending, (state, action) => {
@@ -96,24 +91,19 @@ const mediaSlice = createSlice({
     builder.addCase(userMedia.rejected, (state, action) => {
       state.load = 'failed';
     });
-    builder.addCase(addMedia.pending, (state, action) => {
+    builder.addCase(saveMedia.pending, (state, action) => {
       state.load = 'loading';
     });
-    builder.addCase(addMedia.fulfilled, (state, action) => {
+    builder.addCase(saveMedia.fulfilled, (state, action) => {
       state.load = 'succeded';
-      state.library.push(action.payload);
+      const existingMedia = state.library.find(media => media.id === action.payload.id);
+      if (existingMedia) {
+        state.library = state.library.map(media => media.id === action.payload.id ? {...media, ...action.payload} : media)
+      } else {
+        state.library.push(action.payload);
+      }
     });
-    builder.addCase(addMedia.rejected, (state, action) => {
-      state.load = 'failed';
-    });
-    builder.addCase(updateMedia.pending, (state, action) => {
-      state.load = 'loading';
-      state.library = state.library.map(element => element.id == action.payload.id ? action.payload : element);
-    });
-    builder.addCase(updateMedia.fulfilled, (state, action) => {
-      state.load = 'succeded';
-    });
-    builder.addCase(updateMedia.rejected, (state, action) => {
+    builder.addCase(saveMedia.rejected, (state, action) => {
       state.load = 'failed';
     });
     builder.addCase(deleteMedia.pending, (state, action) => {
@@ -129,5 +119,5 @@ const mediaSlice = createSlice({
   },
 });
 
-export const { resetSearch } = mediaSlice.actions;
+export const { resetSearch, resetMedia, editMedia } = mediaSlice.actions;
 export default mediaSlice.reducer;

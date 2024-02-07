@@ -1,10 +1,9 @@
-import { _getUserMedia, _addMedia, _updateMedia, _deleteMedia } from "../models/media.models.js";
+import { _getUserMedia, _saveMedia, _deleteMedia } from "../models/media.models.js";
 
 export const getUserMedia = async(req, res) => {
-    const userId = req.user.id;
-    const {type} = req.params;
+    const { user_id } = req.params;
     try {
-        const rows = await _getUserMedia(userId, type);
+        const rows = await _getUserMedia(user_id);
         res.status(200).json(rows);
     } catch (error) {
         console.log('getUserMedia=>', error);
@@ -12,25 +11,24 @@ export const getUserMedia = async(req, res) => {
     }
 }
 
-export const addMedia = async(req, res) => {
-    const userId = req.user.id;
-    const {type} = req.params;
-    const {apiId, title, image, description, status, released, progress, progressMax, rating, releaseDate, updateDate} = req.body;
+export const saveMedia = async(req, res) => {
+    const media = req.body;
+    console.log(req.body)
 
     try {
-        const row = await _addMedia(userId, apiId, title, type, image, description, status, released, progress, progressMax, rating, releaseDate, updateDate);
+        const row = await _saveMedia(media);
         res.status(201).json(row);
     } catch (error) {
-        console.log('addMedia=>', error);
-        res.status(404).json({msg: 'Unable to add media'});
+        console.log('saveMedia=>', error);
+        res.status(404).json({msg: 'Unable to save media'});
     }
 }
 
 export const updateMedia = async(req, res) => {
     const {id} = req.params;
-    const {title, image, description, status, released, progress, progressMax, rating, releaseDate, updateDate} = req.body;
+    const media = req.body;
     try {
-        const row = await _updateMedia(id, title, image, description, status, released, progress, progressMax, rating, releaseDate, updateDate);
+        const row = await _updateMedia(id, media);
         res.status(201).json(row);
     } catch (error) {
         console.log('updateMedia=>', error);

@@ -24,10 +24,10 @@ export const login = async(req, res) => {
         const {username, password} = req.body;
         const row = await _login(username);
         if (row.length === 0) {
-            return res.status(404).json({msg: 'Username not found'});
+            return res.status(403).json({msg: 'Username not found'});
         }
         const match = bcrypt.compareSync(password + "", row[0].password);
-        if (!match) return res.status(401).json({msg: 'Invalid password'});
+        if (!match) return res.status(403).json({msg: 'Invalid password'});
 
         const secret = process.env.ACCESS_TOKEN_SECRET;
         const user = {

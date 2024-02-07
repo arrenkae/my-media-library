@@ -17,22 +17,20 @@ const LoginRegister = ({page}) => {
 
     const loginregister = async(e) => {
         e.preventDefault();
-        console.log(process.env);
         if (page === 'Login') {
             try {
                 const response = await axios.post(`${BASE_URL}/users/login`, {
                     username: usernameRef.current.value,
                     password: passwordRef.current.value
                 });
-                console.log(response);
                 if(response.status = 200) {
                     setToken(response.data.token);
                     setUser(response.data.user);
                     navigate('/profile');
                 }
             } catch (error) {
-                console.log(error);
-                showError(error.response.data.msg);
+                console.log(error.message);
+                showError(error.response.data.msg ? error.response.data.msg : error.message);
             }
         }
         else {
@@ -45,8 +43,8 @@ const LoginRegister = ({page}) => {
                     navigate('/login');
                 }
             } catch (error) {
-                console.log(error);
-                showError(error.response.data.msg);
+                console.log(error.message);
+                showError(error.response.data.msg ? error.response.data.msg : error.message);
             }
         }
     }

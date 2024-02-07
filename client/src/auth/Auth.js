@@ -22,11 +22,11 @@ const Auth = (props) => {
             if (response.status === 200) setRedirect(true);
         } catch (error) {
             setRedirect(false);
-            console.log(error);
+            console.log(error.message);
         }
     }
 
-    return redirect ? props.children : ''
+    return redirect ? props.children : <h1>Not authorized</h1>
 }
 
 export default Auth;
