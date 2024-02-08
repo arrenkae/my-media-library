@@ -18,10 +18,10 @@ const Library = (props) => {
     const renderLibrary = 
     <>
         <h1>Your Library</h1>
-        { Object.keys(media).length > 0 ? <Details /> : null }
+        { media ? <Details /> : null }
         {library.map(element =>
             <div key={element.id}>
-                <LibraryData data={element} />
+                <LibraryData media={element} />
             </div>
         )};
     </>

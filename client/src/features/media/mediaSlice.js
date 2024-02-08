@@ -8,8 +8,7 @@ const API_KEY = process.env.REACT_APP_API_KEY;
 const initialState = {
     library: [],
     search: [],
-    media: {},
-    load: 'idle'
+    load: 'idle',
 };
 
 export const searchMedia = createAsyncThunk("media/search", async(query) => {
@@ -17,10 +16,10 @@ export const searchMedia = createAsyncThunk("media/search", async(query) => {
   return response.data.results;
 });
 
-export const fetchMedia = createAsyncThunk("media/fetch", async(apiId) => {
-  const response = await axios.get(`https://api.themoviedb.org/3/tv/${apiId}?api_key=${API_KEY}`);
-  return response.data;
-});
+// export const fetchMedia = createAsyncThunk("media/fetch", async(apiId) => {
+//   const response = await axios.get(`https://api.themoviedb.org/3/tv/${apiId}?api_key=${API_KEY}`);
+//   return response.data;
+// });
 
 export const userMedia = createAsyncThunk("media/library", async(user_id) => {
   const response = await axios.get(`${BASE_URL}/media/${user_id}`);
@@ -44,11 +43,14 @@ const mediaSlice = createSlice({
     resetSearch: (state, action) => {
       state.search = [];
     },
-    resetMedia: (state, action) => {
-      state.media = {};
+    resetFetch: (state, action) => {
+      state.fetched = null;
     },
     editMedia: (state, action) => {
       state.media = action.payload;
+    },
+    sortMedia: (state, action) => {
+      state.sort = action.payload;
     },
   },
   extraReducers(builder) {
@@ -62,32 +64,26 @@ const mediaSlice = createSlice({
     builder.addCase(searchMedia.rejected, (state, action) => {
         state.load = 'failed';
     });
-    builder.addCase(fetchMedia.pending, (state, action) => {
-      state.load = 'loading';
-    });
-    builder.addCase(fetchMedia.fulfilled, (state, action) => {
-      state.load = 'succeded';
-      const data = {
-        api_id: action.payload.id,
-        title: action.payload.name,
-        type: 'tv',
-        image: `https://image.tmdb.org/t/p/w200${action.payload.poster_path}`,
-        description: action.payload.overview,
-        released: action.payload.status !== 'In Production',
-        progress_max: action.payload.number_of_episodes,
-        release_date: action.payload.first_air_date,
-        update_date: action.payload.last_air_date
-      };
-      const oldMedia = state.library.find(element => element.api_id === action.payload.id);
-      if (oldMedia) {
-        state.media = {...oldMedia, ...data};
-      } else {
-        state.media = data;
-      }
-    });
-    builder.addCase(fetchMedia.rejected, (state, action) => {
-        state.load = 'failed';
-    });
+    // builder.addCase(fetchMedia.pending, (state, action) => {
+    //   state.load = 'loading';
+    // });
+    // builder.addCase(fetchMedia.fulfilled, (state, action) => {
+    //   state.load = 'succeded';
+    //   state.fetched = {
+    //     api_id: action.payload.id,
+    //     title: action.payload.name,
+    //     type: 'tv',
+    //     image: `https://image.tmdb.org/t/p/w200${action.payload.poster_path}`,
+    //     description: action.payload.overview,
+    //     released: action.payload.status !== 'In Production',
+    //     progress_max: action.payload.number_of_episodes,
+    //     release_date: action.payload.first_air_date,
+    //     update_date: action.payload.last_air_date
+    //   };
+    // });
+    // builder.addCase(fetchMedia.rejected, (state, action) => {
+    //     state.load = 'failed';
+    // });
     builder.addCase(userMedia.pending, (state, action) => {
       state.load = 'loading';
     });
@@ -125,5 +121,5 @@ const mediaSlice = createSlice({
   },
 });
 
-export const { resetSearch, resetMedia, editMedia } = mediaSlice.actions;
+export const { resetSearch, resetFetch, editMedia, sortMedia } = mediaSlice.actions;
 export default mediaSlice.reducer;
