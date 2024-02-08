@@ -22,6 +22,9 @@ const LoginRegister = ({page}) => {
                 const response = await axios.post(`${BASE_URL}/users/login`, {
                     username: usernameRef.current.value,
                     password: passwordRef.current.value
+                },
+                {
+                    withCredentials: true
                 });
                 if(response.status = 200) {
                     setToken(response.data.token);
@@ -30,7 +33,7 @@ const LoginRegister = ({page}) => {
                 }
             } catch (error) {
                 console.log(error.message);
-                showError(error.response.data.msg ? error.response.data.msg : error.message);
+                showError(error.message);
             }
         }
         else {
@@ -38,13 +41,16 @@ const LoginRegister = ({page}) => {
                 const response = await axios.post(`${BASE_URL}/users/register`, {
                     username: usernameRef.current.value,
                     password: passwordRef.current.value
+                },
+                {
+                    credentials: true
                 });
                 if(response.status = 200) {
                     navigate('/login');
                 }
             } catch (error) {
                 console.log(error.message);
-                showError(error.response.data.msg ? error.response.data.msg : error.message);
+                showError(error.message);
             }
         }
     }

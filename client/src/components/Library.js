@@ -12,7 +12,7 @@ const Library = (props) => {
     const dispatch = useDispatch();
 
     useEffect(()=>{
-        dispatch(userMedia(user.id));
+        dispatch(userMedia(user?.id));
     }, [])
 
     const renderLibrary = 

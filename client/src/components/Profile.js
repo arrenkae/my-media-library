@@ -9,7 +9,7 @@ const Home = (props) => {
     return (
         <>
             <h1>Profile</h1>
-            <h2>Welcome, {user.username}!</h2>
+            <h2>Welcome, {user?.username}!</h2>
             <Logout />
             <Library />
         </>

@@ -13,7 +13,9 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true }));
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(cookieParser());

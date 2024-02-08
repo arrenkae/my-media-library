@@ -39,7 +39,7 @@ export const login = async(req, res) => {
             expiresIn: '1h',
         });
 
-        res.cookie('token', token, { httpOnly: true });
+        res.cookie('token', token, { httpOnly: true, maxAge: 3600000, secure: true, sameSite: "None" });
         res.status(200).json({token, user, msg: 'Login successful'});
 
     } catch (error) {

@@ -13,6 +13,7 @@ const Logout = (props) => {
     const logout = async() => {
         try {
             const response = await axios.get(`${BASE_URL}/users/logout`, {
+                withCredentials: true
             })
             if (response.status === 200) {
                 setToken('');
