@@ -66,7 +66,6 @@ const Library = (props) => {
     const handleCloseDetails = () => {
         setDetailsFetchId(null);
         setOpenDetails(false);
-        setSearchResults([]);
     };
 
     const handleChangeType = (event, newValue) => {

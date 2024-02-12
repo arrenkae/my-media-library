@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { userMedia, deleteMedia } from "../features/media/mediaSlice";
+import { userMedia, deleteMedia, saveMedia } from "../features/media/mediaSlice";
 import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Typography, Chip, Rating } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -28,7 +28,7 @@ const LibraryCard = ({media}) => {
                 return 'primary';
         }
     }
-
+    
     const renderLibraryCard = 
         <Card sx={{ maxWidth: 200, minHeight: 500, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
             <CardMedia
@@ -43,7 +43,7 @@ const LibraryCard = ({media}) => {
                 <Typography variant="body2" color="text.secondary">
                     Progress: {media.progress} / {media.progress_max}
                 </Typography>
-                <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly />
+                { media.rating != 0 ? <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly /> : null }
                 <Chip label={media.status} sx={{ mt: 1 }} color={chipColor()} />
             </CardContent >
             <CardActions sx={{ display: 'flex', justifyContent:'flex-end' }}>

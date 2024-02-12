@@ -22,7 +22,7 @@ const style = {
 };
 
 const Details = (props) => {
-    const { library, detailsFetchId, openDetails, handleCloseDetails } = useContext(LibraryContext);
+    const { library, detailsFetchId, openDetails, handleCloseDetails, setSearchResults } = useContext(LibraryContext);
     const type = useSelector(state => state.media.type);
     const [media, setMedia] = useState();
     const [status, setStatus] = useState('Backlog');
@@ -75,7 +75,8 @@ const Details = (props) => {
         }))
         .then((data) => console.log(data))
         .then(() => dispatch(userMedia()))
-        .then(() => handleCloseDetails());
+        .then(() => handleCloseDetails())
+        .then(() => setSearchResults([]));
     }
 
     const handleSelect = (e) => {
@@ -120,31 +121,35 @@ const Details = (props) => {
                         onChange={handleSelect}
                         >
                         <MenuItem value='Backlog'>Backlog</MenuItem>
-                        <MenuItem value='Active'>Active</MenuItem>
-                        <MenuItem value='On-hold'>On-hold</MenuItem>
-                        <MenuItem value='Dropped'>Dropped</MenuItem>
-                        <MenuItem value='Completed'>Completed</MenuItem>
+                        { media.released ? <MenuItem value='Active'>Active</MenuItem> : null }
+                        { media.released ? <MenuItem value='On-hold'>On-hold</MenuItem> : null }
+                        { media.released ? <MenuItem value='Dropped'>Dropped</MenuItem> : null }
+                        { media.released ? <MenuItem value='Completed'>Completed</MenuItem> : null }
                     </Select>
                 </FormControl>
-                <Rating
-                    sx={{ m: 3 }}
-                    name="rating"
-                    value={rating}
-                    precision={0.5}
-                    onChange={(e, newValue) => {
-                        setRating(newValue);
-                    }}
-                />
-                <Typography id="input-slider" gutterBottom>
-                        Progress: {progress} / {media.progress_max}
-                </Typography>
-                <Slider
-                    value={progress}
-                    onChange={handleSliderChange}
-                    max={media.progress_max}
-                    valueLabelDisplay="auto"
-                    aria-labelledby="input-slider"
-                />
+                { media.released ?
+                <>
+                    <Rating
+                        sx={{ m: 3 }}
+                        name="rating"
+                        value={rating}
+                        precision={0.5}
+                        onChange={(e, newValue) => {
+                            setRating(newValue);
+                        }}
+                    />
+                    <Typography id="input-slider" gutterBottom>
+                            Progress: {progress} / {media.progress_max}
+                    </Typography>
+                    <Slider
+                        value={progress}
+                        onChange={handleSliderChange}
+                        max={media.progress_max}
+                        valueLabelDisplay="auto"
+                        aria-labelledby="input-slider"
+                    />
+                </>
+                : null }
                 <Fab color="primary" aria-label="save" onClick={save}>
                     <SaveIcon />
                 </Fab>
