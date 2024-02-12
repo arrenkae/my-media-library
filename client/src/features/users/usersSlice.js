@@ -11,14 +11,14 @@ const initialState = {
   error: null
 };
 
-export const getToken = createAsyncThunk("users/token", async() => {
+export const getToken = createAsyncThunk("users/token", async(_, {rejectWithValue}) => {
   try {
     const response = await axios.get(`${BASE_URL}/users/token`, {
         withCredentials: true
     });
     return response.data;
   } catch (error) {
-    console.log(error);
+    return rejectWithValue(error.response.data.msg ? error.response.data.msg : error.message);
   }
 });
 
@@ -121,7 +121,6 @@ const usersSlice = createSlice({
     });
     builder.addCase(verify.rejected, (state, action) => {
       state.load = 'failed';
-      state.error = action.payload;
     });
     builder.addCase(verify.fulfilled, (state, action) => {
       state.load = 'succeded';

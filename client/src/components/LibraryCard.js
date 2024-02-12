@@ -1,13 +1,15 @@
 import { useState, useEffect, useContext, memo } from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { userMedia, deleteMedia } from "../features/media/mediaSlice";
 import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Typography, Chip, Rating } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import { LibraryContext } from "./Library";
+import { types } from "./Library";
 
 const LibraryCard = ({media}) => {
     const { handleOpenDetails } = useContext(LibraryContext);
+    const type = useSelector(state => state.media.type);
     const dispatch = useDispatch();
 
     const chipColor = () => {
@@ -31,7 +33,7 @@ const LibraryCard = ({media}) => {
         <Card sx={{ maxWidth: 200, minHeight: 500, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
             <CardMedia
                 sx={{ width: 200, height: 300 }}
-                image={`https://image.tmdb.org/t/p/w200${media.image}`}
+                image={types[type].imageLink + media.image}
                 title={media.title + ' poster'}
             />
             <CardContent >

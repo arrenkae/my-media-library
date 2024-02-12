@@ -5,8 +5,9 @@ import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select,
 import SaveIcon from '@mui/icons-material/Save';
 import { LibraryContext } from "./Library";
 import axios from "axios";
-
-const API_KEY = process.env.REACT_APP_API_KEY;
+import { types } from "./Library";
+import _ from 'lodash';
+import parse from 'html-react-parser';
 
 const style = {
     position: 'absolute',
@@ -21,8 +22,8 @@ const style = {
 };
 
 const Details = (props) => {
-    const { detailsFetchId, openDetails, handleCloseDetails } = useContext(LibraryContext);
-    const library = useSelector(state => state.media.library);
+    const { library, detailsFetchId, openDetails, handleCloseDetails } = useContext(LibraryContext);
+    const type = useSelector(state => state.media.type);
     const [media, setMedia] = useState();
     const [status, setStatus] = useState('Backlog');
     const [progress, setProgress] = useState(0);
@@ -33,7 +34,7 @@ const Details = (props) => {
     useEffect(()=>{
         fetchMedia()
         .then(data => {
-            const existingMedia = library.find(element => element.api_id === data.api_id)
+            const existingMedia = library.find(element => element.api_id == data.api_id && element.type == type);
             if (existingMedia) {
                 setMedia({...existingMedia, ...data});
                 setStatus(existingMedia.status);
@@ -47,18 +48,18 @@ const Details = (props) => {
 
     const fetchMedia = async() => {
         try {
-            const response = await axios.get(`https://api.themoviedb.org/3/tv/${detailsFetchId}?api_key=${API_KEY}`);
+            const response = await axios.get(types[type].mediaLink + detailsFetchId + '?' + types[type].api_key);
             if (response.status === 200) {
               return {
                 api_id: response.data.id,
-                title: response.data.name,
-                type: 'tv',
-                image: `https://image.tmdb.org/t/p/w200${response.data.poster_path}`,
-                description: response.data.overview,
-                released: response.data.status !== 'In Production',
-                progress_max: response.data.number_of_episodes,
-                release_date: response.data.first_air_date,
-                update_date: response.data.last_air_date
+                title: _.get(response.data, types[type].title),
+                type: type,
+                image: types[type].imageLink + _.get(response.data, types[type].image),
+                description: _.get(response.data, types[type].description),
+                released: new Date(_.get(response.data, types[type].release_date)).getTime() < new Date().getTime(),
+                progress_max: _.get(response.data, types[type].progress_max),
+                release_date: _.get(response.data, types[type].release_date),
+                update_date: type == 'tv' ? _.get(response.data, types[type].last_air_date) : null
               };
             };
         } catch (error) {
@@ -72,6 +73,7 @@ const Details = (props) => {
             progress,
             rating
         }))
+        .then((data) => console.log(data))
         .then(() => dispatch(userMedia()))
         .then(() => handleCloseDetails());
     }
@@ -100,13 +102,13 @@ const Details = (props) => {
                     {media.title}
                 </Typography>
                 <Typography id="release-date" variant="h6">
-                    { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'In production' }
+                    { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'Not yet released' }
                 </Typography>
                 <Typography id="latest-release-date" variant="h6" gutterBottom>
                     { media.update_date ? 'Latest release: ' + media.update_date : null }
                 </Typography>
                 <Typography id="modal-description" variant="body2" gutterBottom>
-                    {media.description}
+                    {parse(`<p>${media.description}</p>`)}
                 </Typography>
                 <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
                     <InputLabel id="status-label">Status</InputLabel>

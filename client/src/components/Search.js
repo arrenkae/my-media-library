@@ -1,14 +1,16 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, memo } from "react";
 import { Paper, InputBase, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import axios from "axios";
 import SearchData from "./SearchData"
-
-const API_KEY = process.env.REACT_APP_API_KEY;
+import { LibraryContext } from "./Library";
+import { types } from "./Library";
+import _ from 'lodash';
 
 const Search = (props) => {
-  const [searchResults, setsearchResults] = useState([]);
+  const type = useSelector(state => state.media.type);
+  const { searchResults, setSearchResults } = useContext(LibraryContext);
   const [query, setQuery] = useState();
 
   const handleQuery = (e) => {
@@ -22,15 +24,15 @@ const Search = (props) => {
   }
 
   const handleClear = (e) => {
-    setsearchResults([]);
+    setSearchResults([]);
     setQuery('');
   }
 
   const search = async() => {
     try {
-        const response = await axios.get(`https://api.themoviedb.org/3/search/tv?query=${query}&api_key=${API_KEY}`);
+        const response = await axios.get(types[type].searchLink + query + '&' + types[type].api_key);
         if (response.status === 200) {
-          setsearchResults(response.data.results);
+          setSearchResults(response.data[types[type].searchResults]);
           setQuery('');
         };
     } catch (error) {
@@ -54,9 +56,9 @@ const Search = (props) => {
           <Button variant="text" onClick={handleSearch}>Search</Button>
           <Button variant="text" onClick={handleClear}>Clear</Button>
         </Paper>
-        <SearchData searchResults={searchResults}/>
+        {searchResults ? <SearchData searchResults={searchResults}/> : null}
     </>
   );
 };
 
-export default Search;
+export default memo(Search);
