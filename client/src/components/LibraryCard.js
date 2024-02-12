@@ -1,14 +1,16 @@
 import { useState, useEffect, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { userMedia, deleteMedia, saveMedia } from "../features/media/mediaSlice";
-import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Typography, Chip, Rating } from '@mui/material';
+import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import { LibraryContext } from "./Library";
 import { types } from "./Library";
 
 const LibraryCard = ({media}) => {
-    const { handleOpenDetails } = useContext(LibraryContext);
+    const { handleOpenDetails, setOpenNotification } = useContext(LibraryContext);
+    const [ openConfirmation, setOpenConfirmation ] = useState(false);
+    const [idToDelete, setIdToDelete] = useState();
     const type = useSelector(state => state.media.type);
     const dispatch = useDispatch();
 
@@ -27,6 +29,24 @@ const LibraryCard = ({media}) => {
             default:
                 return 'primary';
         }
+    }
+
+    const handleCloseConfirmation = () => {
+        setOpenConfirmation(false);
+    };
+
+    const handleAgree = () => {
+        dispatch(deleteMedia(idToDelete))
+        .then(() => {
+            dispatch(userMedia());
+            setOpenNotification(true);
+        })
+        setOpenConfirmation(false);
+    };
+
+    const handleOpenConfirmation = (e) => {
+        setIdToDelete(e.currentTarget.value);
+        setOpenConfirmation(true);
     }
     
     const renderLibraryCard = 
@@ -55,10 +75,8 @@ const LibraryCard = ({media}) => {
                 </IconButton>
                 <IconButton
                     aria-label="delete"
-                    onClick={() => {
-                        dispatch(deleteMedia(media.id));
-                        dispatch(userMedia());
-                    }}
+                    value={media.id}
+                    onClick={handleOpenConfirmation}
                     >
                     <ClearIcon />
                 </IconButton>
@@ -68,6 +86,22 @@ const LibraryCard = ({media}) => {
     return (
         <>
             {renderLibraryCard}
+            <Dialog
+                open={openConfirmation}
+                onClose={handleCloseConfirmation}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                >
+            <DialogTitle id="alert-dialog-title">
+                Are you sure you want to delete this media?
+            </DialogTitle>
+            <DialogActions>
+                <Button onClick={handleCloseConfirmation}>No</Button>
+                <Button onClick={handleAgree} autoFocus>
+                Yes
+                </Button>
+            </DialogActions>
+            </Dialog>
         </>
     );
 }

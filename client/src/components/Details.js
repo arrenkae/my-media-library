@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { saveMedia, userMedia } from "../features/media/mediaSlice";
-import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Rating, Slider, Stack, Input } from '@mui/material';
+import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Rating, Slider, Stack, Input, Alert } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { LibraryContext } from "./Library";
 import axios from "axios";
@@ -16,18 +16,20 @@ const style = {
     transform: 'translate(-50%, -50%)',
     maxWidth: 500,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
     boxShadow: 24,
-    p: 4,
+    p: 6,
+    borderRadius: 2
 };
 
 const Details = (props) => {
-    const { library, detailsFetchId, openDetails, handleCloseDetails, setSearchResults } = useContext(LibraryContext);
+    const { library, detailsFetchId, openDetails, handleCloseDetails, setSearchResults, setOpenNotification } = useContext(LibraryContext);
     const type = useSelector(state => state.media.type);
     const [media, setMedia] = useState();
     const [status, setStatus] = useState('Backlog');
     const [progress, setProgress] = useState(0);
     const [rating, setRating] = useState(0);
+    const [error, setError] = useState();
+    const loadStatus = useSelector(state => state.media.load);
     
     const dispatch = useDispatch();
 
@@ -63,7 +65,7 @@ const Details = (props) => {
               };
             };
         } catch (error) {
-            console.log(error.message);
+            setError('Unable to fetch media details');
         }
     };
 
@@ -73,10 +75,16 @@ const Details = (props) => {
             progress,
             rating
         }))
-        .then((data) => console.log(data))
         .then(() => dispatch(userMedia()))
-        .then(() => handleCloseDetails())
-        .then(() => setSearchResults([]));
+        .then(() => {
+            if (loadStatus == 'failed') {
+                setError('Unable to save')
+            } else {
+                handleCloseDetails();
+                setSearchResults([]);
+                setOpenNotification(true);
+            }
+        })
     }
 
     const handleSelect = (e) => {
@@ -84,13 +92,36 @@ const Details = (props) => {
         if (e.target.value === 'Completed') {
             setProgress(media.progress_max);
         } else {
-            setProgress(media.progress);
+            setProgress(media.progress ? media.progress : 0);
         }
     };
 
     const handleSliderChange = (e) => {
         setProgress(e.target.value);
     }
+
+    const releasedDetails = 
+        <>
+            <Rating
+                sx={{ m: 3 }}
+                name="rating"
+                value={rating}
+                precision={0.5}
+                onChange={(e, newValue) => {
+                    setRating(newValue);
+                }}
+            />
+            <Typography id="input-slider" gutterBottom>
+                    Progress: {progress} / {media?.progress_max}
+            </Typography>
+            <Slider
+                value={progress}
+                onChange={handleSliderChange}
+                max={media?.progress_max}
+                valueLabelDisplay="auto"
+                aria-labelledby="input-slider"
+            />
+        </>
 
     if (media) return  (
         <Modal
@@ -108,7 +139,7 @@ const Details = (props) => {
                 <Typography id="latest-release-date" variant="h6" gutterBottom>
                     { media.update_date ? 'Latest release: ' + media.update_date : null }
                 </Typography>
-                <Typography id="modal-description" variant="body2" gutterBottom>
+                <Typography sx={{ maxHeight: '50vh', overflowY: "scroll"}} id="modal-description" variant="body2" gutterBottom>
                     {parse(`<p>${media.description}</p>`)}
                 </Typography>
                 <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
@@ -127,29 +158,8 @@ const Details = (props) => {
                         { media.released ? <MenuItem value='Completed'>Completed</MenuItem> : null }
                     </Select>
                 </FormControl>
-                { media.released ?
-                <>
-                    <Rating
-                        sx={{ m: 3 }}
-                        name="rating"
-                        value={rating}
-                        precision={0.5}
-                        onChange={(e, newValue) => {
-                            setRating(newValue);
-                        }}
-                    />
-                    <Typography id="input-slider" gutterBottom>
-                            Progress: {progress} / {media.progress_max}
-                    </Typography>
-                    <Slider
-                        value={progress}
-                        onChange={handleSliderChange}
-                        max={media.progress_max}
-                        valueLabelDisplay="auto"
-                        aria-labelledby="input-slider"
-                    />
-                </>
-                : null }
+                { media.released ? releasedDetails : null }
+                {error ? <Alert sx={{ mt: 2, maxWidth: 400 }} severity="error">{error}</Alert> : null}
                 <Fab color="primary" aria-label="save" onClick={save}>
                     <SaveIcon />
                 </Fab>

@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect, useContext, memo } from "react";
-import { Paper, InputBase, Button } from '@mui/material';
+import { Paper, InputBase, Button, Alert } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import axios from "axios";
 import SearchData from "./SearchData"
@@ -11,7 +11,13 @@ import _ from 'lodash';
 const Search = (props) => {
   const type = useSelector(state => state.media.type);
   const { searchResults, setSearchResults } = useContext(LibraryContext);
-  const [query, setQuery] = useState();
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState();
+
+  useEffect(()=>{
+    setError();
+    setQuery('');
+  }, [type]);
 
   const handleQuery = (e) => {
     setQuery(e.target.value);
@@ -20,6 +26,8 @@ const Search = (props) => {
   const handleSearch = () => {
     if (query) {
       search();
+    } else {
+      showError('Search field is empty');
     }
   }
 
@@ -28,15 +36,26 @@ const Search = (props) => {
     setQuery('');
   }
 
+  const showError = (message) => {
+    setError(message);
+    setTimeout(() => { setError() }, 8000);
+  }
+
   const search = async() => {
+    setSearchResults([]);
+    setError();
     try {
         const response = await axios.get(types[type].searchLink + query + '&' + types[type].api_key);
         if (response.status === 200) {
           setSearchResults(response.data[types[type].searchResults]);
-          setQuery('');
+          if (response.data[types[type].searchResults].length === 0) {
+            showError('No media found');
+          } else {
+            setQuery('');
+          }
         };
     } catch (error) {
-        console.log(error.message);
+        showError('Search error');
     }
   };
 
@@ -44,7 +63,7 @@ const Search = (props) => {
     <>
         <Paper
           component="form"
-          sx={{ p: '2px 4px', m: 5, display: 'flex', alignItems: 'center', width: 400 }}
+          sx={{ p: '2px 4px', m: 5, display: 'flex', alignItems: 'center', maxWidth: 400 }}
           >
           <SearchIcon sx={{ ml: 1 }} />
           <InputBase
@@ -56,6 +75,7 @@ const Search = (props) => {
           <Button variant="text" onClick={handleSearch}>Search</Button>
           <Button variant="text" onClick={handleClear}>Clear</Button>
         </Paper>
+        {error ? <Alert variant="outlined" sx={{ ml: 5, maxWidth: 400 }} severity="error">{error}</Alert> : null}
         {searchResults ? <SearchData searchResults={searchResults}/> : null}
     </>
   );
