@@ -2,7 +2,6 @@ import { Routes, Route } from 'react-router-dom';
 import { useEffect, createContext } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { getToken } from "./features/users/usersSlice";
-import Nav from './components/Nav';
 import LoginRegister from './components/LoginRegister';
 import Logout from './components/Logout';
 import Auth from './auth/Auth';
