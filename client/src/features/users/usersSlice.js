@@ -11,14 +11,14 @@ const initialState = {
   error: null
 };
 
-export const getToken = createAsyncThunk("users/token", async({ rejectWithValue }) => {
+export const getToken = createAsyncThunk("users/token", async() => {
   try {
     const response = await axios.get(`${BASE_URL}/users/token`, {
         withCredentials: true
     });
     return response.data;
   } catch (error) {
-    return rejectWithValue(error.response.data.msg ? error.response.data.msg : error.message);
+    console.log(error);
   }
 });
 
@@ -83,16 +83,10 @@ const usersSlice = createSlice({
   reducers: {
     resetLoad: (state, action) => {
       state.load = 'idle';
+      state.error = null;
     },
   },
   extraReducers(builder) {
-    builder.addCase(getToken.rejected, (state, action) => {
-      state.load = 'failed';
-      state.error = action.payload;
-    });
-    builder.addCase(getToken.pending, (state, action) => {
-      state.load = 'loading';
-    });
     builder.addCase(getToken.fulfilled, (state, action) => {
       state.load = 'succeded';
       state.token = action.payload.token;
@@ -120,12 +114,6 @@ const usersSlice = createSlice({
     builder.addCase(register.fulfilled, (state, action) => {
       state.load = 'succeded';
     });
-    builder.addCase(logout.rejected, (state, action) => {
-      state.load = 'failed';
-    });
-    builder.addCase(logout.pending, (state, action) => {
-      state.load = 'loading';
-    });
     builder.addCase(logout.fulfilled, (state, action) => {
       state.load = 'succeded';
       state.user = null;
@@ -133,9 +121,7 @@ const usersSlice = createSlice({
     });
     builder.addCase(verify.rejected, (state, action) => {
       state.load = 'failed';
-    });
-    builder.addCase(verify.pending, (state, action) => {
-      state.load = 'loading';
+      state.error = action.payload;
     });
     builder.addCase(verify.fulfilled, (state, action) => {
       state.load = 'succeded';

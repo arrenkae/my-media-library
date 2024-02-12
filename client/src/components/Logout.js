@@ -1,32 +1,18 @@
-import { useContext } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../features/users/usersSlice";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from '../App';
 import { Button } from '@mui/material';
-import axios from "axios";
-
-const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Logout = (props) => {
     const navigate = useNavigate();
-    const {setToken} = useContext(AuthContext);
-    const {setUser} = useContext(AuthContext);
+    const dispatch = useDispatch();
 
-    const handleLogout = async() => {
-        try {
-            const response = await axios.get(`${BASE_URL}/users/logout`, {
-                withCredentials: true
-            })
-            if (response.status === 200) {
-                setToken();
-                setUser();
-                navigate('/login');
-            }
-        } catch (error) {
-            console.log(error);
-        }
+    const handleLogout = () => {
+        dispatch(logout())
+        .then(() => navigate('/login'));
     }
 
-    return <Button variant="contained" size="small" onClick={handleLogout}>Log out</Button>
+    return <Button variant="contained" onClick={handleLogout}>Logout</Button>
 }
 
 export default Logout;
