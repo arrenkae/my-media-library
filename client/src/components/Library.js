@@ -6,6 +6,7 @@ import LibraryData from './LibraryData';
 import Details from "./Details";
 import Search from './Search';
 import Logout from './Logout';
+import Notification from './Notification';
 import { useTypeSelect, useFilterType } from "../features/media/mediaHooks";
 
 export const LibraryContext = createContext();
@@ -21,7 +22,9 @@ export const types = {
         title: 'name',
         description: 'overview',
         release_date: 'first_air_date',
-        progress_max: 'number_of_episodes'
+        progress_max: 'number_of_episodes',
+        progress: 'episodes',
+        verb: 'watch'
     },
     movie: {
         api_key: `api_key=${process.env.REACT_APP_API_KEY_TMDB}`,
@@ -33,7 +36,9 @@ export const types = {
         title: 'title',
         description: 'overview',
         release_date: 'release_date',
-        progress_max: 'runtime'
+        progress_max: 'runtime',
+        progress: 'minutes',
+        verb: 'watch'
     },
     book: {
         api_key: `key=${process.env.REACT_APP_API_KEY_BOOKS}`,
@@ -45,7 +50,9 @@ export const types = {
         title: 'volumeInfo.title',
         description: 'volumeInfo.description',
         release_date: 'volumeInfo.publishedDate',
-        progress_max: 'volumeInfo.pageCount'
+        progress_max: 'volumeInfo.pageCount',
+        progress: 'pages',
+        verb: 'read'
     }
   }
 
@@ -56,6 +63,7 @@ const Library = (props) => {
     const [searchResults, setSearchResults] = useState([]);
     const [openDetails, setOpenDetails] = useState(false);
     const [detailsFetchId, setDetailsFetchId] = useState(null);
+    const [openNotification, setOpenNotification] = useState(false);
 
     const selectType = useFilterType();
 
@@ -81,7 +89,19 @@ const Library = (props) => {
             </Typography>
             <Logout />
         </Stack>
-        <LibraryContext.Provider value={{library, searchResults, setSearchResults, openDetails, setOpenDetails, detailsFetchId, setDetailsFetchId, handleOpenDetails, handleCloseDetails}}>
+        <LibraryContext.Provider value={{
+            library,
+            searchResults,
+            setSearchResults,
+            openDetails,
+            setOpenDetails,
+            detailsFetchId,
+            setDetailsFetchId,
+            handleOpenDetails,
+            handleCloseDetails,
+            openNotification,
+            setOpenNotification
+            }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={type} onChange={handleChangeType} aria-label="type-select">
                     <Tab label="TV" value="tv" />
@@ -92,6 +112,7 @@ const Library = (props) => {
             <Search />
             <LibraryData />
             {detailsFetchId ? <Details /> : null}
+            <Notification message={'Library updated!'} />
         </LibraryContext.Provider>
         </>
     )

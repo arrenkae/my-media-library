@@ -52,7 +52,7 @@ export const register = createAsyncThunk("users/register", async({ username, pas
   }
 });
 
-export const logout = createAsyncThunk("users/logout", async({ rejectWithValue }) => {
+export const logout = createAsyncThunk("users/logout", async(_, { rejectWithValue }) => {
   try {
     const response = await axios.get(`${BASE_URL}/users/logout`, {
         withCredentials: true
