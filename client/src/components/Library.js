@@ -1,21 +1,20 @@
-import { useState, useEffect, createContext } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { userMedia } from "../features/media/mediaSlice";
-import { Grid, Box, Typography, CircularProgress } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Stack, Typography } from '@mui/material';
+
 import LibraryData from './LibraryData';
 import Details from "./Details";
 import Search from './Search';
 import Logout from './Logout';
+import { AuthContext } from "../App";
 
 export const LibraryContext = createContext();
 
 const Library = (props) => {
-    const token = useSelector(state => state.users.token);
     const [openDetails, setOpenDetails] = useState(false);
     const [detailsFetchId, setDetailsFetchId] = useState(null);
-
-    console.log(token);
+    const {user} = useContext(AuthContext);
 
     const handleOpenDetails = (id) => {
         setDetailsFetchId(id);
@@ -28,7 +27,12 @@ const Library = (props) => {
 
     return (
         <>
-        <Logout />
+        <Stack direction="row" spacing={2} sx={{m:5}}>
+            <Typography id="user-welcome" variant="h4">
+                Welcome, {user?.username}
+            </Typography>
+            <Logout />
+        </Stack>
         <LibraryContext.Provider value={{openDetails, setOpenDetails, detailsFetchId, setDetailsFetchId, handleOpenDetails, handleCloseDetails}}>
             <Search />
             <LibraryData />

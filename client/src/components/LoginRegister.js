@@ -1,41 +1,52 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link, redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { login, register, resetLoad } from "../features/users/usersSlice";
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, Alert } from '@mui/material';
+import { AuthContext } from "../App";
+import axios from 'axios';
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const LoginRegister = ({page}) => {
-    const token = useSelector(state => state.users.token);
+    const [error, setError] = useState();
     const [username, setUsername] = useState();
     const [password, setPassword] = useState();
-    const loadStatus = useSelector(state => state.users.load);
-    const errorMsg = useSelector(state => state.users.error);
 
-    const dispatch = useDispatch();
+    const {setToken} = useContext(AuthContext);
+    const {setUser} = useContext(AuthContext);
     const navigate = useNavigate();
 
-    useEffect(()=>{
-        console.log(token);
-        if (token) {
-            console.log(token);
-            return redirect('/library');
-        }
-        dispatch(resetLoad());
-    }, [])
-
-    const loginregister = async() => {
+    const loginregister = async(e) => {
+        e.preventDefault();
         if (page === 'Login') {
-            dispatch(login({username, password}))
-            .then(() => {
-                if (loadStatus == 'succeded') {
+            try {
+                const response = await axios.post(`${BASE_URL}/users/login`, {username, password},
+                {
+                    withCredentials: true
+                });
+                if(response.status = 200) {
+                    setToken(response.data.token);
+                    setUser(response.data.user);
                     navigate('/library');
-                    dispatch(resetLoad());
                 }
-            })
+            } catch (error) {
+                showError(error.response ? error.response.data.msg : error.message);
+            }
         }
         else {
-            dispatch(register({username, password}));
+            try {
+                const response = await axios.post(`${BASE_URL}/users/register`, {username, password},
+                {
+                    withCredentials: true
+                });
+                if(response.status = 200) {
+                    navigate('/login');
+                }
+            } catch (error) {
+                showError(error.response ? error.response.data.msg : error.message);
+            }
         }
     }
 
@@ -47,15 +58,20 @@ const LoginRegister = ({page}) => {
         }
     }
 
+    const showError = (message) => {
+        setError(message);
+        setTimeout(() => { setError() }, 5000);
+    }
+
     return (
         <div>
             <h1>{page}</h1>
-            <Box component={'form'} sx={{m:1}} noValidate autoComplete="off">
+            <Box component={'form'} sx={{m:2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}} noValidate autoComplete="off">
                 <TextField
                     sx={{m:1}}
                     id='username'
                     type='username'
-                    label='Enter your username'
+                    label='Username'
                     variant='outlined'
                     onChange={(e) => setUsername(e.target.value)}
                 />
@@ -63,14 +79,14 @@ const LoginRegister = ({page}) => {
                     sx={{m:1}}
                     id='password'
                     type='password'
-                    label='Enter your password'
+                    label='Password'
                     variant='outlined'
                     onChange={(e) => setPassword(e.target.value)}
                 />
+            {error ? <Alert severity="error">{error}</Alert> : null}
             </Box>
             <Button variant="contained" onClick={loginregister}>{page}</Button>
             <div>{pageSwitch()}</div>
-            <div className="errorMsg">{errorMsg}</div>
         </div>
     );
 };

@@ -27,10 +27,19 @@ const LibraryData = (props) => {
             </Box>
         </>
 
-    if (loadStatus === 'loading') return <CircularProgress />;
-    if (loadStatus === 'failed') return <h2>Unable to load library</h2>;
-
-    return library.length > 0 ? renderLibrary : <h2>Your library is empty!</h2>;
+    if (loadStatus === 'loading') {
+        return <CircularProgress />;
+    } else if (loadStatus === 'failed') {
+        return <h2>Unable to load library</h2>;
+    } else if (loadStatus === 'succeded') {
+        if (library.length > 0) {
+            return renderLibrary;
+        } else {
+            return ;
+        }
+    } else {
+        return null;
+    }
 };
 
 export default memo(LibraryData);
