@@ -6,7 +6,10 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const initialState = {
     library: [],
+    search: [],
     load: 'idle',
+    searchLoad: 'idle',
+    type: 'tv'
 };
 
 export const userMedia = createAsyncThunk("media/library", async() => {
@@ -34,8 +37,8 @@ const mediaSlice = createSlice({
   name: 'media',
   initialState,
   reducers: {
-    sortMedia: (state, action) => {
-      state.sort = action.payload;
+    filterType: (state, action) => {
+      state.type = action.payload;
     },
   },
   extraReducers(builder) {
@@ -70,5 +73,8 @@ const mediaSlice = createSlice({
   },
 });
 
-export const { sortMedia } = mediaSlice.actions;
+export const library = (state) => state.media.library;
+export const type = (state) => state.media.type;
+
+export const { filterType } = mediaSlice.actions;
 export default mediaSlice.reducer;

@@ -1,13 +1,15 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, useRef, useEffect, useContext, memo } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { userMedia } from "../features/media/mediaSlice";
 import { Grid, Box, Typography, CircularProgress } from '@mui/material';
 import LibraryCard from './LibraryCard';
+import { LibraryContext } from "./Library";
 
 const LibraryData = (props) => {
-    const library = useSelector(state => state.media.library);
+    const { library } = useContext(LibraryContext);
     const loadStatus = useSelector(state => state.media.load);
     const dispatch = useDispatch();
+    const type = useSelector(state => state.media.type);
 
     useEffect(()=>{
         dispatch(userMedia());
@@ -15,7 +17,8 @@ const LibraryData = (props) => {
 
     const renderLibrary = 
         <>
-            <h1>Your Library</h1>
+            <h1>Your {type} Library</h1>
+            { library.length > 0 ?
             <Box sx={{ flexGrow: 1, m: 5 }}>
                 <Grid container spacing={3}>
                     {library.map(element =>
@@ -25,6 +28,7 @@ const LibraryData = (props) => {
                     )}
                 </Grid>
             </Box>
+            : <h2>Your {type} library is empty!</h2> }
         </>
 
     if (loadStatus === 'loading') {
@@ -32,11 +36,7 @@ const LibraryData = (props) => {
     } else if (loadStatus === 'failed') {
         return <h2>Unable to load library</h2>;
     } else if (loadStatus === 'succeded') {
-        if (library.length > 0) {
-            return renderLibrary;
-        } else {
-            return ;
-        }
+        return renderLibrary;
     } else {
         return null;
     }
