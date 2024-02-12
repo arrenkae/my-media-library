@@ -1,41 +1,19 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect } from "react";
 import { CircularProgress } from '@mui/material';
-import axios from "axios";
-import { AuthContext } from '../App';
-
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+import { useSelector, useDispatch } from "react-redux";
+import { verify } from "../features/users/usersSlice";
 
 const Auth = (props) => {
-    const [redirect, setRedirect] = useState(false);
-    const [message, setMessage] = useState('');
-    const {token} = useContext(AuthContext);
+    const token = useSelector(state => state.users.token);
+    const loadStatus = useSelector(state => state.users.load);
+
+    const dispatch = useDispatch();
 
     useEffect(()=>{
-        verify();
+        dispatch(verify(token));
     }, [])
 
-    const verify = async() => {
-        try {
-            const response = await axios.get(`${BASE_URL}/users/verify`, {
-                headers: {
-                    'x-access-token': token ? token : ''
-                },
-                withCredentials: true
-            })
-            if (response.status === 200) {
-                setRedirect(true);
-                setMessage('');
-            } else {
-                setMessage('Not authorized');
-            };
-        } catch (error) {
-            setRedirect(false);
-            setMessage('Not authorized');
-            console.log(error);
-        }
-    }
-
-    return redirect ? props.children : message ? <h1>{message}</h1> : <CircularProgress />;
+    return token ? props.children : loadStatus == 'failed' ? <h1>Not authorized</h1> : null;
 }
 
 export default Auth;

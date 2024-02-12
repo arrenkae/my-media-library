@@ -1,52 +1,31 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link, redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { login, register, resetLoad } from "../features/users/usersSlice";
-import { Box, TextField, Button, Alert } from '@mui/material';
-import { AuthContext } from "../App";
-import axios from 'axios';
-
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+import { Box, TextField, Button, Alert, CircularProgress } from '@mui/material';
 
 const LoginRegister = ({page}) => {
-    const [error, setError] = useState();
+    const token = useSelector(state => state.users.token);
+    const [alert, setAlert] = useState();
     const [username, setUsername] = useState();
     const [password, setPassword] = useState();
+    const loadStatus = useSelector(state => state.users.load);
+    const error = useSelector(state => state.users.error);
 
-    const {setToken} = useContext(AuthContext);
-    const {setUser} = useContext(AuthContext);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const loginregister = async(e) => {
-        e.preventDefault();
+    useEffect(()=>{
+        dispatch(resetLoad());
+    }, [])
+
+    const loginregister = async() => {
         if (page === 'Login') {
-            try {
-                const response = await axios.post(`${BASE_URL}/users/login`, {username, password},
-                {
-                    withCredentials: true
-                });
-                if(response.status = 200) {
-                    setToken(response.data.token);
-                    setUser(response.data.user);
-                    navigate('/library');
-                }
-            } catch (error) {
-                showError(error.response ? error.response.data.msg : error.message);
-            }
+            dispatch(login({username, password}))
         }
         else {
-            try {
-                const response = await axios.post(`${BASE_URL}/users/register`, {username, password},
-                {
-                    withCredentials: true
-                });
-                if(response.status = 200) {
-                    navigate('/login');
-                }
-            } catch (error) {
-                showError(error.response ? error.response.data.msg : error.message);
-            }
+            dispatch(register({username, password}));
         }
     }
 
@@ -58,20 +37,15 @@ const LoginRegister = ({page}) => {
         }
     }
 
-    const showError = (message) => {
-        setError(message);
-        setTimeout(() => { setError() }, 5000);
-    }
-
-    return (
-        <div>
+    const renderLoginRegister =
+        <>
             <h1>{page}</h1>
             <Box component={'form'} sx={{m:2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}} noValidate autoComplete="off">
                 <TextField
                     sx={{m:1}}
                     id='username'
                     type='username'
-                    label='Username'
+                    label='Enter your username'
                     variant='outlined'
                     onChange={(e) => setUsername(e.target.value)}
                 />
@@ -79,16 +53,23 @@ const LoginRegister = ({page}) => {
                     sx={{m:1}}
                     id='password'
                     type='password'
-                    label='Password'
+                    label='Enter your password'
                     variant='outlined'
                     onChange={(e) => setPassword(e.target.value)}
                 />
             {error ? <Alert severity="error">{error}</Alert> : null}
+            { loadStatus == 'loading' ? <CircularProgress /> : null }
             </Box>
             <Button variant="contained" onClick={loginregister}>{page}</Button>
             <div>{pageSwitch()}</div>
-        </div>
-    );
+        </>
+
+    if (loadStatus == 'succeded' && token) {
+        navigate('/library');
+    }
+
+    return renderLoginRegister;
+
 };
 
 export default LoginRegister;
