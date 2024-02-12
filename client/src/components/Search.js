@@ -1,28 +1,60 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useRef, useEffect, cloneElement } from "react";
-import { searchMedia, resetSearch } from "../features/media/mediaSlice";
+import { useState, useEffect } from "react";
+import { Paper, InputBase, Button } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import axios from "axios";
 import SearchData from "./SearchData"
 
+const API_KEY = process.env.REACT_APP_API_KEY;
+
 const Search = (props) => {
-  const search = useSelector(state => state.media.search);
-  const loadStatus = useSelector(state => state.media.load);
-  const queryRef = useRef(null);
-  const dispatch = useDispatch();
+  const [searchResults, setsearchResults] = useState([]);
+  const [query, setQuery] = useState();
 
-  useEffect(()=>{
-    dispatch(resetSearch());
-  }, [])
+  const handleQuery = (e) => {
+    setQuery(e.target.value);
+  }
 
-  const renderSearch = search.map(element => <SearchData media={element} />);
+  const handleSearch = () => {
+    if (query) {
+      search();
+    }
+  }
+
+  const handleClear = (e) => {
+    setsearchResults([]);
+    setQuery('');
+  }
+
+  const search = async() => {
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/search/tv?query=${query}&api_key=${API_KEY}`);
+        if (response.status === 200) {
+          setsearchResults(response.data.results);
+          setQuery('');
+        };
+    } catch (error) {
+        console.log(error.message);
+    }
+  };
 
   return (
     <>
-      <div>
-          <h2>Search results</h2>
-          <input type="text" ref={queryRef} />
-          <button onClick={() => dispatch(searchMedia(queryRef.current.value))}>Search</button>
-          { loadStatus === 'succeded' ? renderSearch : loadStatus === 'loading' ? ' Loading...' : ' Something went wrong' }
-      </div>
+        <Paper
+          component="form"
+          sx={{ p: '2px 4px', m: 5, display: 'flex', alignItems: 'center', width: 400 }}
+          >
+          <SearchIcon sx={{ ml: 1 }} />
+          <InputBase
+            sx={{ ml: 1, flex: 1 }}
+            inputProps={{ 'aria-label': 'search new media' }}
+            onChange={handleQuery}
+            value={query}
+          />
+          <Button variant="text" onClick={handleSearch}>Search</Button>
+          <Button variant="text" onClick={handleClear}>Clear</Button>
+        </Paper>
+        <SearchData searchResults={searchResults}/>
     </>
   );
 };

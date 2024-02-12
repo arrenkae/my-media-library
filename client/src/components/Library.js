@@ -1,32 +1,41 @@
-import { useContext, useEffect } from 'react';
+import { useState, useEffect, createContext } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { userMedia } from "../features/media/mediaSlice";
-import Details from './Details';
+import { Grid, Box, Typography, CircularProgress } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LibraryData from './LibraryData';
-import { AuthContext } from '../App';
+import Details from "./Details";
+import Search from './Search';
+import Logout from './Logout';
+
+export const LibraryContext = createContext();
 
 const Library = (props) => {
-    const {user} = useContext(AuthContext);
-    const library = useSelector(state => state.media.library);
-    const media = useSelector(state => state.media.media)
-    const dispatch = useDispatch();
+    const token = useSelector(state => state.users.token);
+    const [openDetails, setOpenDetails] = useState(false);
+    const [detailsFetchId, setDetailsFetchId] = useState(null);
 
-    useEffect(()=>{
-        dispatch(userMedia(user?.id));
-    }, [])
+    console.log(token);
 
-    const renderLibrary = 
-    <>
-        <h1>Your Library</h1>
-        { media ? <Details /> : null }
-        {library.map(element =>
-            <div key={element.id}>
-                <LibraryData media={element} />
-            </div>
-        )};
-    </>
+    const handleOpenDetails = (id) => {
+        setDetailsFetchId(id);
+        setOpenDetails(true);
+    };
+    const handleCloseDetails = () => {
+        setDetailsFetchId(null);
+        setOpenDetails(false);
+    };
 
-    return library.length > 0 ? renderLibrary : <h2>Your library is empty!</h2>;
+    return (
+        <>
+        <Logout />
+        <LibraryContext.Provider value={{openDetails, setOpenDetails, detailsFetchId, setDetailsFetchId, handleOpenDetails, handleCloseDetails}}>
+            <Search />
+            <LibraryData />
+            {detailsFetchId ? <Details /> : null}
+        </LibraryContext.Provider>
+        </>
+    )
 };
 
 export default Library;

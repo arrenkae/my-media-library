@@ -1,10 +1,9 @@
-import {useContext} from 'react';
-import { AuthContext } from '../App';
+import { useSelector } from "react-redux";
 import Library from './Library';
 import Logout from './Logout';
 
 const Home = (props) => {
-    const {user} = useContext(AuthContext);
+    const user = useSelector(state => state.users.user);
 
     return (
         <>

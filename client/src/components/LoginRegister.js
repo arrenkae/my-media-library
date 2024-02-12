@@ -1,63 +1,42 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-
-import { AuthContext } from "../App";
-
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+import { Link, redirect } from 'react-router-dom';
+import { useSelector, useDispatch } from "react-redux";
+import { login, register, resetLoad } from "../features/users/usersSlice";
+import { Box, TextField, Button } from '@mui/material';
 
 const LoginRegister = ({page}) => {
-    const [errorMsg, setErrorMsg] = useState();
-    const usernameRef = useRef(null);
-    const passwordRef = useRef(null);
+    const token = useSelector(state => state.users.token);
+    const [username, setUsername] = useState();
+    const [password, setPassword] = useState();
+    const loadStatus = useSelector(state => state.users.load);
+    const errorMsg = useSelector(state => state.users.error);
 
-    const {setToken, setUser} = useContext(AuthContext);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const loginregister = async(e) => {
-        e.preventDefault();
+    useEffect(()=>{
+        console.log(token);
+        if (token) {
+            console.log(token);
+            return redirect('/library');
+        }
+        dispatch(resetLoad());
+    }, [])
+
+    const loginregister = async() => {
         if (page === 'Login') {
-            try {
-                const response = await axios.post(`${BASE_URL}/users/login`, {
-                    username: usernameRef.current.value,
-                    password: passwordRef.current.value
-                },
-                {
-                    withCredentials: true
-                });
-                if(response.status = 200) {
-                    setToken(response.data.token);
-                    setUser(response.data.user);
-                    navigate('/profile');
+            dispatch(login({username, password}))
+            .then(() => {
+                if (loadStatus == 'succeded') {
+                    navigate('/library');
+                    dispatch(resetLoad());
                 }
-            } catch (error) {
-                console.log(error.message);
-                showError(error.message);
-            }
+            })
         }
         else {
-            try {
-                const response = await axios.post(`${BASE_URL}/users/register`, {
-                    username: usernameRef.current.value,
-                    password: passwordRef.current.value
-                },
-                {
-                    credentials: true
-                });
-                if(response.status = 200) {
-                    navigate('/login');
-                }
-            } catch (error) {
-                console.log(error.message);
-                showError(error.message);
-            }
+            dispatch(register({username, password}));
         }
-    }
-
-    const showError = (message) => {
-        setErrorMsg(message);
-        setTimeout(() => { setErrorMsg('') }, 3000);
     }
 
     const pageSwitch = () => {
@@ -71,11 +50,25 @@ const LoginRegister = ({page}) => {
     return (
         <div>
             <h1>{page}</h1>
-            <form onSubmit={loginregister}>
-                <input type="text" ref={usernameRef} placeholder="Username" />
-                <input type="password" ref={passwordRef} placeholder="Password" />
-                <input type="submit" value={page} />
-            </form>
+            <Box component={'form'} sx={{m:1}} noValidate autoComplete="off">
+                <TextField
+                    sx={{m:1}}
+                    id='username'
+                    type='username'
+                    label='Enter your username'
+                    variant='outlined'
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <TextField
+                    sx={{m:1}}
+                    id='password'
+                    type='password'
+                    label='Enter your password'
+                    variant='outlined'
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+            </Box>
+            <Button variant="contained" onClick={loginregister}>{page}</Button>
             <div>{pageSwitch()}</div>
             <div className="errorMsg">{errorMsg}</div>
         </div>

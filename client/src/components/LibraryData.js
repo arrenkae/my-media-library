@@ -1,61 +1,36 @@
-import { useState, useEffect, useContext, memo } from "react";
-import { useDispatch } from "react-redux";
-import { userMedia, deleteMedia } from "../features/media/mediaSlice";
-import { AuthContext } from '../App';
-import axios from "axios";
-import Details from "./Details";
+import { useState, useEffect, memo } from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { userMedia } from "../features/media/mediaSlice";
+import { Grid, Box, Typography, CircularProgress } from '@mui/material';
+import LibraryCard from './LibraryCard';
 
-const API_KEY = process.env.REACT_APP_API_KEY;
-
-const LibraryData = ({media}) => {
-    const [updatedMedia, setUpdatedMedia] = useState(media);
-    const [editing, setEditing] = useState(null);
-    const {user} = useContext(AuthContext);
+const LibraryData = (props) => {
+    const library = useSelector(state => state.media.library);
+    const loadStatus = useSelector(state => state.media.load);
     const dispatch = useDispatch();
 
     useEffect(()=>{
-        fetchNewMedia().then(data => setUpdatedMedia({...media, ...data}));
-    }, [])
+        dispatch(userMedia());
+    }, []);
 
-    const fetchNewMedia = async() => {
-        try {
-            const response = await axios.get(`https://api.themoviedb.org/3/tv/${media.api_id}?api_key=${API_KEY}`);
-            if (response.status === 200) {
-              return {
-                api_id: response.data.id,
-                title: response.data.name,
-                type: 'tv',
-                image: `https://image.tmdb.org/t/p/w200${response.data.poster_path}`,
-                description: response.data.overview,
-                released: response.data.status !== 'In Production',
-                progress_max: response.data.number_of_episodes,
-                release_date: response.data.first_air_date,
-                update_date: response.data.last_air_date
-              };
-            };
-        } catch (error) {
-            console.log(error.message);
-        }
-    }
+    const renderLibrary = 
+        <>
+            <h1>Your Library</h1>
+            <Box sx={{ flexGrow: 1, m: 5 }}>
+                <Grid container spacing={3}>
+                    {library.map(element =>
+                        <Grid item key={element.id}>
+                            <LibraryCard media={element} />
+                        </Grid>
+                    )}
+                </Grid>
+            </Box>
+        </>
 
-    const renderLibraryData = 
-        <div key={updatedMedia.id}>
-            <h2>{updatedMedia.title}</h2>
-            { updatedMedia.image ? <img src={'https://image.tmdb.org/t/p/w200' + updatedMedia.image} alt={updatedMedia.title + ' poster'} /> : '[No image]' }
-            { updatedMedia.description ? <p>{updatedMedia.description}</p> : null }
-            <p>{ updatedMedia.released ? updatedMedia.release_date ? 'Release date: ' + updatedMedia.release_date : 'Release date: unknown' : 'Not yet released' }</p>
-            { updatedMedia.update_date ? <p>Latest release: {updatedMedia.update_date}</p> : null }
-            { updatedMedia.status ? <h4>Status: {updatedMedia.status}</h4> : null }
-            { updatedMedia.progress ? <h5>Progress: {updatedMedia.progress} / {updatedMedia.progress_max}</h5> :  null }
-            { updatedMedia.rating ? <h5>Rating: {updatedMedia.rating}</h5> : null }
-            <button onClick={() => setEditing(updatedMedia)}>Edit</button>
-            <button onClick={() => {
-                dispatch(deleteMedia(updatedMedia.id));
-                dispatch(userMedia(user.id));
-            }}>Delete</button>
-        </div>
+    if (loadStatus === 'loading') return <CircularProgress />;
+    if (loadStatus === 'failed') return <h2>Unable to load library</h2>;
 
-    return editing ? <Details media={editing} reset={setEditing} /> : renderLibraryData;
-}
+    return library.length > 0 ? renderLibrary : <h2>Your library is empty!</h2>;
+};
 
 export default memo(LibraryData);

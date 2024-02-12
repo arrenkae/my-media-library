@@ -1,12 +1,20 @@
 import { Link } from 'react-router-dom';
-import Auth from '../auth/Auth';
+import { Button, Stack } from '@mui/material';
 
 const Nav = (props) => {
     return (
-        <>
-            <Link className="App-link" to='/login'>Login</Link>
-            <Link className="App-link" to='/profile'>Profile</Link>
-            <Link className="App-link" to='/search'>Search</Link>
+        <>  
+            <Stack spacing={2} direction={'row'}>
+                <Button component={Link} to='/login'>
+                    Login
+                </Button>
+                <Button component={Link} to='/profile'>
+                    Profile
+                </Button>
+                <Button component={Link} to='/search'>
+                    Search
+                </Button>
+            </Stack>
         </>
     );
 };

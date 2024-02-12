@@ -20,7 +20,6 @@ users_router.get('/verify', verifytoken, (req, res) => {
 
 users_router.get('/token', (req, res) => {
     const token = req.cookies.token || req.headers['x-access-token'];
-    console.log('Token from the server=> ', token);
     if (token) {
         res.status(200).json({token});
     } else {

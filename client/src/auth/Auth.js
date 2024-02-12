@@ -1,33 +1,18 @@
-import { useEffect, useState, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from '../App';
-
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { verify } from "../features/users/usersSlice";
 
 const Auth = (props) => {
-    const [redirect, setRedirect] = useState(false);
-    const {token} = useContext(AuthContext);
+    const token = useSelector(state => state.users.token);
+    const loadStatus = useSelector(state => state.users.load);
+
+    const dispatch = useDispatch();
 
     useEffect(()=>{
-        verify();
+        dispatch(verify(token));
     }, [])
 
-    const verify = async() => {
-        try {
-            const response = await axios.get(`${BASE_URL}/users/verify`, {
-                headers: {
-                    'x-access-token': token ? token : ''
-                },
-                withCredentials: true
-            })
-            if (response.status === 200) setRedirect(true);
-        } catch (error) {
-            setRedirect(false);
-            console.log(error);
-        }
-    }
-
-    return redirect ? props.children : <h1>Not authorized</h1>
+    return loadStatus === 'succeded' ? props.children : loadStatus === 'loading' ? <h1>Loading...</h1> : <h1>Not authorized</h1>
 }
 
 export default Auth;
