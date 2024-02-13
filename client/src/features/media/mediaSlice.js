@@ -6,13 +6,13 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const initialState = {
     library: [],
-    search: [],
     load: 'idle',
-    searchLoad: 'idle',
-    type: 'tv'
+    type: 'tv',
+    status: 'All',
+    sort: 'updated'
 };
 
-export const userMedia = createAsyncThunk("media/library", async() => {
+export const getMedia = createAsyncThunk("media/library", async() => {
   const response = await axios.get(`${BASE_URL}/media/library`, {
     withCredentials: true
   });
@@ -40,16 +40,22 @@ const mediaSlice = createSlice({
     filterType: (state, action) => {
       state.type = action.payload;
     },
+    filterStatus: (state, action) => {
+      state.status = action.payload;
+    },
+    selectSort: (state, action) => {
+      state.sort = action.payload;
+    },
   },
   extraReducers(builder) {
-    builder.addCase(userMedia.pending, (state, action) => {
+    builder.addCase(getMedia.pending, (state, action) => {
       state.load = 'loading';
     });
-    builder.addCase(userMedia.fulfilled, (state, action) => {
+    builder.addCase(getMedia.fulfilled, (state, action) => {
       state.load = 'succeded';
       state.library = action.payload;
     });
-    builder.addCase(userMedia.rejected, (state, action) => {
+    builder.addCase(getMedia.rejected, (state, action) => {
       state.load = 'failed';
     });
     builder.addCase(saveMedia.pending, (state, action) => {
@@ -75,6 +81,8 @@ const mediaSlice = createSlice({
 
 export const library = (state) => state.media.library;
 export const type = (state) => state.media.type;
+export const status = (state) => state.media.status;
+export const sort = (state) => state.media.sort;
 
-export const { filterType } = mediaSlice.actions;
+export const { filterType, filterStatus, selectSort } = mediaSlice.actions;
 export default mediaSlice.reducer;

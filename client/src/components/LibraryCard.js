@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { userMedia, deleteMedia, saveMedia } from "../features/media/mediaSlice";
+import { deleteMedia, saveMedia } from "../features/media/mediaSlice";
+import { useGetMedia } from "../features/media/mediaHooks";
 import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -13,6 +14,8 @@ const LibraryCard = ({media}) => {
     const [idToDelete, setIdToDelete] = useState();
     const type = useSelector(state => state.media.type);
     const dispatch = useDispatch();
+
+    const getMedia = useGetMedia();
 
     const chipColor = () => {
         switch (media.status) {
@@ -38,7 +41,7 @@ const LibraryCard = ({media}) => {
     const handleAgree = () => {
         dispatch(deleteMedia(idToDelete))
         .then(() => {
-            dispatch(userMedia());
+            getMedia();
             setOpenNotification(true);
         })
         setOpenConfirmation(false);

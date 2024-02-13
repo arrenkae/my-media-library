@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect, createContext, useContext, memo } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { userMedia } from "../features/media/mediaSlice";
-import { Stack, Typography, Tabs, Tab, Box } from '@mui/material';
+import { Stack, Typography, Tabs, Tab, Box, Divider } from '@mui/material';
 import LibraryData from './LibraryData';
 import Details from "./Details";
 import Search from './Search';
 import Logout from './Logout';
 import Notification from './Notification';
-import { useTypeSelect, useFilterType } from "../features/media/mediaHooks";
+import { useLibrarySelect, useFilterType } from "../features/media/mediaHooks";
 
 export const LibraryContext = createContext();
 
@@ -57,7 +56,7 @@ export const types = {
   }
 
 const Library = (props) => {
-    const library = useTypeSelect();
+    const library = useLibrarySelect();
     const user = useSelector(state => state.users.user);
     const type = useSelector(state => state.media.type);
     const [searchResults, setSearchResults] = useState([]);
@@ -71,6 +70,7 @@ const Library = (props) => {
         setDetailsFetchId(id);
         setOpenDetails(true);
     };
+
     const handleCloseDetails = () => {
         setDetailsFetchId(null);
         setOpenDetails(false);
@@ -102,15 +102,18 @@ const Library = (props) => {
             openNotification,
             setOpenNotification
             }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Stack sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={type} onChange={handleChangeType} aria-label="type-select">
                     <Tab label="TV" value="tv" />
                     <Tab label="Movies" value="movie" />
                     <Tab label="Books" value="book" />
                 </Tabs>
-            </Box>
-            <Search />
-            <LibraryData />
+            </Stack>
+            <Stack>
+                <Search />
+                <Divider />
+                <LibraryData />
+            </Stack>
             {detailsFetchId ? <Details /> : null}
             <Notification message={'Library updated!'} />
         </LibraryContext.Provider>

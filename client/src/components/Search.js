@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect, useContext, memo } from "react";
-import { Paper, InputBase, Button, Alert } from '@mui/material';
+import { Paper, InputBase, Button, Alert, Typography, Stack } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import axios from "axios";
 import SearchData from "./SearchData"
@@ -60,10 +60,13 @@ const Search = (props) => {
   };
 
   return (
-    <>
+    <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
+        <Typography id="search-header" variant="h6">
+            Search for new {types[type].typename}
+        </Typography>
         <Paper
           component="form"
-          sx={{ p: '2px 4px', m: 5, display: 'flex', alignItems: 'center', maxWidth: 400 }}
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', maxWidth: 400 }}
           >
           <SearchIcon sx={{ ml: 1 }} />
           <InputBase
@@ -75,9 +78,9 @@ const Search = (props) => {
           <Button variant="text" onClick={handleSearch}>Search</Button>
           <Button variant="text" onClick={handleClear}>Clear</Button>
         </Paper>
-        {error ? <Alert variant="outlined" sx={{ ml: 5, maxWidth: 400 }} severity="error">{error}</Alert> : null}
+        {error ? <Alert variant="outlined" sx={{ maxWidth: 380 }} severity="error">{error}</Alert> : null}
         {searchResults ? <SearchData /> : null}
-    </>
+    </Stack>
   );
 };
 
