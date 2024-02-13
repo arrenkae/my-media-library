@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { saveMedia } from "../features/media/mediaSlice";
 import { useGetMedia } from "../features/media/mediaHooks";
-import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Rating, Slider, Stack, Input, Alert } from '@mui/material';
+import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Rating, Slider, Stack, Input, Alert, CircularProgress, InputAdornment, OutlinedInput, FormHelperText } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { LibraryContext } from "./Library";
 import axios from "axios";
@@ -24,10 +24,12 @@ const style = {
 
 const Details = (props) => {
     const { library, detailsFetchId, openDetails, handleCloseDetails, setSearchResults, setOpenNotification } = useContext(LibraryContext);
+    const fullLibrary = useSelector(state => state.media.library);
     const type = useSelector(state => state.media.type);
     const [media, setMedia] = useState();
     const [status, setStatus] = useState('Backlog');
     const [progress, setProgress] = useState(0);
+    const [progress_seasons, setProgressSeasons] = useState(0);
     const [rating, setRating] = useState(0);
     const [error, setError] = useState();
     const loadStatus = useSelector(state => state.media.load);
@@ -38,16 +40,18 @@ const Details = (props) => {
     useEffect(()=>{
         fetchMedia()
         .then(data => {
-            const existingMedia = library.find(element => element.api_id == data.api_id && element.type == type);
+            const existingMedia = fullLibrary.find(element => element.api_id == data.api_id && element.type == data.type);
             if (existingMedia) {
                 setMedia({...existingMedia, ...data});
                 setStatus(existingMedia.status);
                 setProgress(existingMedia.progress);
                 setRating(existingMedia.rating)
+                setProgressSeasons(existingMedia.progress_seasons);
             } else {
                 setMedia(data);
             };
         })
+        .catch(err => console.log(err))
     }, [])
 
     const fetchMedia = async() => {
@@ -57,13 +61,15 @@ const Details = (props) => {
               return {
                 api_id: response.data.id,
                 title: _.get(response.data, types[type].title),
+                author: type == 'book' ? response.data.volumeInfo.authors[0] : null,
                 type: type,
                 image: types[type].imageLink + _.get(response.data, types[type].image),
                 description: _.get(response.data, types[type].description),
                 released: new Date(_.get(response.data, types[type].release_date)).getTime() < new Date().getTime(),
                 progress_max: _.get(response.data, types[type].progress_max),
+                progress_seasons_max: type == 'tv' ? response.data.number_of_seasons : null,
                 release_date: _.get(response.data, types[type].release_date),
-                update_date: type == 'tv' ? response.data.last_air_date : null
+                update_date: type == 'tv' ? _.get(response.data, types[type].last_air_date) : null
               };
             };
         } catch (error) {
@@ -75,7 +81,9 @@ const Details = (props) => {
         dispatch(saveMedia({...media,
             status,
             progress,
-            rating
+            rating,
+            progress_seasons: type === 'tv' ? progress_seasons : null
+
         }))
         .then(() => getMedia())
         .then(() => {
@@ -93,13 +101,25 @@ const Details = (props) => {
         setStatus(e.target.value);
         if (e.target.value === 'Completed') {
             setProgress(media.progress_max);
+            if ( type === 'tv') {
+                setProgressSeasons(media.progress_seasons_max);
+            }
         } else {
             setProgress(media.progress ? media.progress : 0);
+            if ( type === 'tv') {
+                setProgressSeasons(media.progress_seasons ? media.progress_seasons : 0);
+            }
         }
     };
 
     const handleSliderChange = (e) => {
         setProgress(e.target.value);
+    }
+
+    const handleSeasonChange = (e) => {
+        if (0 <= Number(e.target.value) <= media?.progress_seasons_max) {
+            setProgressSeasons(e.target.value);
+        }
     }
 
     const releasedDetails = 
@@ -114,7 +134,7 @@ const Details = (props) => {
                 }}
             />
             <Typography id="input-slider" gutterBottom>
-                    Progress: {progress} / {media?.progress_max}
+                    Progress: {progress} / {media?.progress_max} {types[type].progress}
             </Typography>
             <Slider
                 value={progress}
@@ -123,9 +143,26 @@ const Details = (props) => {
                 valueLabelDisplay="auto"
                 aria-labelledby="input-slider"
             />
+            {
+                type === 'tv' ?
+                    <FormControl sx={{ m: 1, width: '11ch' }} variant="outlined">
+                        <OutlinedInput
+                            id="season-number"
+                            type="number"
+                            inputProps={{ min: 0, max: media?.progress_seasons_max }}
+                            value={progress_seasons}
+                            endAdornment={<InputAdornment position="end"> / {media?.progress_seasons_max}</InputAdornment>}
+                            onChange={handleSeasonChange}
+                        />
+                        <FormHelperText id="season-helper-text">Seasons</FormHelperText>
+                    </FormControl>
+                : null
+            }
         </>
 
-    if (media) {
+    if (loadStatus === 'loading') {
+        return <CircularProgress />;
+    } else if (loadStatus === 'succeded' && media) {
         return  (
         <Modal
             open={openDetails}
@@ -133,9 +170,21 @@ const Details = (props) => {
             aria-labelledby="media details"
             >
             <Box sx={style}>
-                <Typography id="modal-title" variant="h4" gutterBottom>
-                    {media.title}
-                </Typography>
+                <Stack direction="row" justifyContent="space-between">
+                    <Typography id="modal-title" variant="h4" sx={{ maxWidth: 420}} gutterBottom>
+                        {media.title}
+                    </Typography>
+                    <Fab color="primary" aria-label="save" onClick={save}>
+                        <SaveIcon />
+                    </Fab>
+                </Stack>
+                {
+                    type === 'book' ? 
+                    <Typography id="book-author" variant="h5" gutterBottom>
+                        {media.author}
+                    </Typography>
+                    : null
+                }
                 <Typography id="release-date" variant="h6">
                     { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'Not yet released' }
                 </Typography>
@@ -163,9 +212,6 @@ const Details = (props) => {
                 </FormControl>
                 { media.released ? releasedDetails : null }
                 {error ? <Alert sx={{ mt: 2, maxWidth: 400 }} severity="error">{error}</Alert> : null}
-                <Fab color="primary" aria-label="save" onClick={save}>
-                    <SaveIcon />
-                </Fab>
             </Box>
         </Modal>
     )};

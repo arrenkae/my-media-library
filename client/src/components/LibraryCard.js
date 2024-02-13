@@ -63,9 +63,23 @@ const LibraryCard = ({media}) => {
                 <Typography id="card-title" variant="h6" gutterBottom>
                     {media.title}
                 </Typography>
+                {   
+                    type === 'book' ?
+                    <Typography id="book-author" variant="h6" gutterBottom>
+                        {media.author}
+                    </Typography>
+                    : null
+                }
                 <Typography variant="body2" color="text.secondary">
                     {media.progress} / {media.progress_max} {types[type].progress}
                 </Typography>
+                {
+                    type === 'tv' ?
+                    <Typography variant="body2" color="text.secondary">
+                        {media.progress_seasons} / {media.progress_seasons_max} seasons
+                    </Typography>
+                    :null
+                }
                 { media.rating != 0 ? <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly /> : null }
                 <Chip label={media.status} sx={{ mt: 1 }} color={chipColor()} />
             </CardContent >
