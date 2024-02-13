@@ -1,16 +1,20 @@
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, useContext, memo } from "react";
 import { useSelector } from "react-redux";
 import { Grid, Box, Typography, CircularProgress } from '@mui/material';
 import SearchCard from "./SearchCard";
+import { LibraryContext } from "./Library";
 
-const SearchData = ({searchResults}) => {
+const SearchData = (props) => {
+    const { searchResults } = useContext(LibraryContext);
 
     const renderSearch = 
     <>
-        <h1>Search results</h1>
+        <Typography id="search-results-header" variant="h4">
+                Search results for: {searchResults.query}
+        </Typography>
         <Box sx={{ flexGrow: 1, m: 5 }}>
             <Grid container spacing={3}>
-                {searchResults.map(element =>
+                {searchResults.results?.map(element =>
                     <Grid item key={element.id}>
                         <SearchCard media={element} />
                     </Grid>
@@ -20,7 +24,7 @@ const SearchData = ({searchResults}) => {
     </>
 
     return (
-      searchResults.length > 0 ? renderSearch : null
+        searchResults.results?.length > 0 ? renderSearch : null
     )
 }
 

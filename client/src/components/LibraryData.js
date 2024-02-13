@@ -4,6 +4,7 @@ import { userMedia } from "../features/media/mediaSlice";
 import { Grid, Box, Typography, CircularProgress } from '@mui/material';
 import LibraryCard from './LibraryCard';
 import { LibraryContext } from "./Library";
+import { types } from './Library';
 
 const LibraryData = (props) => {
     const { library } = useContext(LibraryContext);
@@ -13,11 +14,14 @@ const LibraryData = (props) => {
 
     useEffect(()=>{
         dispatch(userMedia());
+        console.log(type);
     }, []);
 
     const renderLibrary = 
         <>
-            <h1>Your {type} Library</h1>
+            <Typography id="library-header" variant="h4">
+                Your {types[type].typename}
+            </Typography>
             { library.length > 0 ?
             <Box sx={{ flexGrow: 1, m: 5 }}>
                 <Grid container spacing={3}>

@@ -61,7 +61,7 @@ const LibraryCard = ({media}) => {
                     {media.title}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    Progress: {media.progress} / {media.progress_max}
+                    {media.progress} / {media.progress_max} {types[type].progress}
                 </Typography>
                 { media.rating != 0 ? <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly /> : null }
                 <Chip label={media.status} sx={{ mt: 1 }} color={chipColor()} />

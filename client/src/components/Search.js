@@ -47,7 +47,7 @@ const Search = (props) => {
     try {
         const response = await axios.get(types[type].searchLink + query + '&' + types[type].api_key);
         if (response.status === 200) {
-          setSearchResults(response.data[types[type].searchResults]);
+          setSearchResults({query, results: response.data[types[type].searchResults]});
           if (response.data[types[type].searchResults].length === 0) {
             showError('No media found');
           } else {
@@ -76,7 +76,7 @@ const Search = (props) => {
           <Button variant="text" onClick={handleClear}>Clear</Button>
         </Paper>
         {error ? <Alert variant="outlined" sx={{ ml: 5, maxWidth: 400 }} severity="error">{error}</Alert> : null}
-        {searchResults ? <SearchData searchResults={searchResults}/> : null}
+        {searchResults ? <SearchData /> : null}
     </>
   );
 };

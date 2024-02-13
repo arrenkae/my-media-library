@@ -13,6 +13,7 @@ export const LibraryContext = createContext();
 
 export const types = {
     tv: {
+        typename: 'TV shows',
         api_key: `api_key=${process.env.REACT_APP_API_KEY_TMDB}`,
         searchLink: 'https://api.themoviedb.org/3/search/tv?query=',
         mediaLink: 'https://api.themoviedb.org/3/tv/',
@@ -23,10 +24,10 @@ export const types = {
         description: 'overview',
         release_date: 'first_air_date',
         progress_max: 'number_of_episodes',
-        progress: 'episodes',
-        verb: 'watch'
+        progress: 'episodes'
     },
     movie: {
+        typename: 'movies',
         api_key: `api_key=${process.env.REACT_APP_API_KEY_TMDB}`,
         searchLink: 'https://api.themoviedb.org/3/search/movie?query=',
         mediaLink: 'https://api.themoviedb.org/3/movie/',
@@ -37,10 +38,10 @@ export const types = {
         description: 'overview',
         release_date: 'release_date',
         progress_max: 'runtime',
-        progress: 'minutes',
-        verb: 'watch'
+        progress: 'minutes'
     },
     book: {
+        typename: 'books',
         api_key: `key=${process.env.REACT_APP_API_KEY_BOOKS}`,
         searchLink: 'https://www.googleapis.com/books/v1/volumes?q=',
         mediaLink: 'https://www.googleapis.com/books/v1/volumes/',
@@ -51,8 +52,7 @@ export const types = {
         description: 'volumeInfo.description',
         release_date: 'volumeInfo.publishedDate',
         progress_max: 'volumeInfo.pageCount',
-        progress: 'pages',
-        verb: 'read'
+        progress: 'pages'
     }
   }
 
