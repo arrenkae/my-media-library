@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link, redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
-import { login, register, resetLoad } from "../features/users/usersSlice";
+import { login, register, resetLoad, setMessage } from "../features/users/usersSlice";
 import { Box, TextField, Button, Alert, CircularProgress, Typography } from '@mui/material';
 
 const LoginRegister = ({page}) => {
     const token = useSelector(state => state.users.token);
-    const [alert, setAlert] = useState();
-    const [username, setUsername] = useState();
-    const [password, setPassword] = useState();
+    const [alert, setAlert] = useState(false);
+    const usernameRef = useRef(null);
+    const passwordRef = useRef(null);
     const loadStatus = useSelector(state => state.users.load);
-    const error = useSelector(state => state.users.error);
+    const message = useSelector(state => state.users.message);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -20,21 +20,33 @@ const LoginRegister = ({page}) => {
         dispatch(resetLoad());
     }, [])
 
+    useEffect(()=>{
+        if (usernameRef.current?.value) usernameRef.current.value = '';
+        if (passwordRef.current?.value) passwordRef.current.value = '';
+        setAlert(false);
+    }, [page])
+
     const loginregister = async() => {
-        if (page === 'Login') {
-            dispatch(login({username, password}))
-        }
-        else {
-            dispatch(register({username, password}));
+        if (usernameRef.current.value && passwordRef.current.value) {
+            if (page === 'Login') {
+                dispatch(login({username: usernameRef.current.value, password: passwordRef.current.value}))
+                .then(() => showAlert());
+            }
+            else {
+                dispatch(register({username: usernameRef.current.value, password: passwordRef.current.value}))
+                .then(() => showAlert());
+            }
+            usernameRef.current.value = '';
+            passwordRef.current.value = '';
+        } else {
+            dispatch(setMessage('Username and password required'));
+            showAlert();
         }
     }
 
-    const pageSwitch = () => {
-        if (page === 'Login') {
-            return <p>New user? <Link to='/register'>Register</Link></p>
-        } else {
-            return <p>Existing user? <Link to='/login'>Log in</Link></p>;
-        }
+    const showAlert = () => {
+        setAlert(true);
+        setTimeout(() => { setAlert() }, 5000);
     }
 
     const renderLoginRegister =
@@ -50,23 +62,35 @@ const LoginRegister = ({page}) => {
                     sx={{m:1}}
                     id='username'
                     type='username'
-                    label='Enter your username'
+                    label='Username'
                     variant='outlined'
-                    onChange={(e) => setUsername(e.target.value)}
+                    inputRef={usernameRef}
                 />
                 <TextField
                     sx={{m:1}}
                     id='password'
                     type='password'
-                    label='Enter your password'
+                    label='Password'
                     variant='outlined'
-                    onChange={(e) => setPassword(e.target.value)}
+                    inputRef={passwordRef}
                 />
-            {error ? <Alert severity="error">{error}</Alert> : null}
-            { loadStatus == 'loading' ? <CircularProgress /> : null }
+            { alert ?
+                message === 'Registration successful!' ?
+                <Alert severity='success'>{message}</Alert> :
+                <Alert severity='error'>{message}</Alert>
+                : null }
             </Box>
-            <Button variant="contained" onClick={loginregister}>{page}</Button>
-            <div>{pageSwitch()}</div>
+            <Button variant="contained" onClick={loginregister} sx={{mb:2}}>{page}</Button>
+            {
+                page === 'Login' ?
+                <Typography variant="h6" gutterBottom>
+                    New user? <Link to='/register'>Register</Link>
+                </Typography> :
+                <Typography variant="h6" gutterBottom>
+                    Existing user? <Link to='/login'>Log in</Link>
+                </Typography>
+            }
+            { loadStatus == 'loading' ? <CircularProgress sx={{mt:2}}/> : null }
         </Box>
 
     if (loadStatus == 'succeded' && token) {

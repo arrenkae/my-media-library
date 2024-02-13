@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState, createContext } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { getToken } from "./features/users/usersSlice";
@@ -13,13 +13,13 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(()=>{
-    if (!token) dispatch(getToken());
+    if (!token) dispatch(getToken())
   }, [])
 
   return (
     <div className="App">
         <Routes>
-          <Route path='/' element={token ? <Auth><Library/></Auth> : <LoginRegister page={'Login'}/>} />
+          <Route path='/' element={ <Navigate to="/login" /> } />
           <Route path='/login' element={<LoginRegister page={'Login'}/>} />
           <Route path='/register' element={<LoginRegister page={'Register'}/>} />
           <Route path='/library' element={<Auth><Library/></Auth>} />

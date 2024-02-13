@@ -8,7 +8,7 @@ const initialState = {
   user: null,
   token: null,
   load: 'idle',
-  error: null
+  message: null
 };
 
 export const getToken = createAsyncThunk("users/token", async(_, {rejectWithValue}) => {
@@ -83,7 +83,10 @@ const usersSlice = createSlice({
   reducers: {
     resetLoad: (state, action) => {
       state.load = 'idle';
-      state.error = null;
+      state.message = null;
+    },
+    setMessage: (state, action) => {
+      state.message = action.payload;
     },
   },
   extraReducers(builder) {
@@ -95,7 +98,7 @@ const usersSlice = createSlice({
     });
     builder.addCase(login.rejected, (state, action) => {
       state.load = 'failed';
-      state.error = action.payload;
+      state.message = action.payload;
     });
     builder.addCase(login.pending, (state, action) => {
       state.load = 'loading';
@@ -107,12 +110,14 @@ const usersSlice = createSlice({
     });
     builder.addCase(register.rejected, (state, action) => {
       state.load = 'failed';
+      state.message = action.payload;
     });
     builder.addCase(register.pending, (state, action) => {
       state.load = 'loading';
     });
     builder.addCase(register.fulfilled, (state, action) => {
       state.load = 'succeded';
+      state.message = 'Registration successful!';
     });
     builder.addCase(logout.fulfilled, (state, action) => {
       state.load = 'succeded';
@@ -128,5 +133,5 @@ const usersSlice = createSlice({
   },
 });
 
-export const { resetLoad } = usersSlice.actions;
+export const { resetLoad, setMessage } = usersSlice.actions;
 export default usersSlice.reducer;
