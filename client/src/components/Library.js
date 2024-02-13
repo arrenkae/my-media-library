@@ -6,6 +6,7 @@ import Details from "./Details";
 import Search from './Search';
 import Logout from './Logout';
 import Notification from './Notification';
+import TopBar from './TopBar';
 import { useLibrarySelect, useFilterType } from "../features/media/mediaHooks";
 
 export const LibraryContext = createContext();
@@ -83,12 +84,7 @@ const Library = (props) => {
 
     return (
         <>
-        <Stack direction="row" spacing={2} sx={{m:5}}>
-            <Typography id="user-welcome" variant="h4">
-                Welcome, {user?.username}
-            </Typography>
-            <Logout />
-        </Stack>
+        <TopBar />
         <LibraryContext.Provider value={{
             library,
             searchResults,
