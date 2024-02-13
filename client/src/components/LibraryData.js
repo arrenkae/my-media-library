@@ -33,7 +33,7 @@ const LibraryData = (props) => {
     const renderLibrary = 
         <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
             <Typography id="library-header" variant="h4" gutterBottom>
-                Your {types[type].typename}
+                My {types[type].typename}
             </Typography>
             <Stack direction="row" spacing={2}>
                 <ToggleButtonGroup
