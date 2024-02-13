@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Link, redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { login, register, resetLoad } from "../features/users/usersSlice";
-import { Box, TextField, Button, Alert, CircularProgress } from '@mui/material';
+import { Box, TextField, Button, Alert, CircularProgress, Typography } from '@mui/material';
 
 const LoginRegister = ({page}) => {
     const token = useSelector(state => state.users.token);
@@ -38,8 +38,13 @@ const LoginRegister = ({page}) => {
     }
 
     const renderLoginRegister =
-        <>
-            <h1>{page}</h1>
+        <Box sx={{m:5}}>
+            <Typography id="app-header" variant="h2" gutterBottom>
+                My Media Library
+            </Typography>
+            <Typography id="login-header" variant="h4" gutterBottom>
+                {page}
+            </Typography>
             <Box component={'form'} sx={{m:2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}} noValidate autoComplete="off">
                 <TextField
                     sx={{m:1}}
@@ -62,7 +67,7 @@ const LoginRegister = ({page}) => {
             </Box>
             <Button variant="contained" onClick={loginregister}>{page}</Button>
             <div>{pageSwitch()}</div>
-        </>
+        </Box>
 
     if (loadStatus == 'succeded' && token) {
         navigate('/library');

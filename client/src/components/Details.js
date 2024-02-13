@@ -160,61 +160,61 @@ const Details = (props) => {
             }
         </>
 
-    if (loadStatus === 'loading') {
-        return <CircularProgress />;
-    } else if (loadStatus === 'succeded' && media) {
-        return  (
-        <Modal
-            open={openDetails}
-            onClose={handleCloseDetails}
-            aria-labelledby="media details"
-            >
-            <Box sx={style}>
-                <Stack direction="row" justifyContent="space-between">
-                    <Typography id="modal-title" variant="h4" sx={{ maxWidth: 420}} gutterBottom>
-                        {media.title}
+    if (media) {
+        return (
+            <Modal
+                open={openDetails}
+                onClose={handleCloseDetails}
+                aria-labelledby="media details"
+                >
+                <Box sx={style}>
+                    <Stack direction="row" justifyContent="space-between">
+                        <Typography id="modal-title" variant="h4" sx={{ maxWidth: 420}} gutterBottom>
+                            {media.title}
+                        </Typography>
+                        <Fab color="primary" aria-label="save" onClick={save}>
+                            <SaveIcon />
+                        </Fab>
+                    </Stack>
+                    {
+                        type === 'book' ? 
+                        <Typography id="book-author" variant="h5" gutterBottom>
+                            {media.author}
+                        </Typography>
+                        : null
+                    }
+                    <Typography id="release-date" variant="h6">
+                        { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'Not yet released' }
                     </Typography>
-                    <Fab color="primary" aria-label="save" onClick={save}>
-                        <SaveIcon />
-                    </Fab>
-                </Stack>
-                {
-                    type === 'book' ? 
-                    <Typography id="book-author" variant="h5" gutterBottom>
-                        {media.author}
+                    <Typography id="latest-release-date" variant="h6" gutterBottom>
+                        { media.update_date ? 'Last aired: ' + media.update_date : null }
                     </Typography>
-                    : null
-                }
-                <Typography id="release-date" variant="h6">
-                    { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'Not yet released' }
-                </Typography>
-                <Typography id="latest-release-date" variant="h6" gutterBottom>
-                    { media.update_date ? 'Last aired: ' + media.update_date : null }
-                </Typography>
-                <Typography sx={{ maxHeight: '50vh', overflowY: "scroll"}} id="modal-description" variant="body2" gutterBottom>
-                    {parse(`<p>${media.description}</p>`)}
-                </Typography>
-                <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
-                    <InputLabel id="status-label">Status</InputLabel>
-                    <Select
-                        labelId="status-select-label"
-                        id="status-select"
-                        value={status}
-                        label="Status"
-                        onChange={handleSelect}
-                        >
-                        <MenuItem value='Backlog'>Backlog</MenuItem>
-                        { media.released ? <MenuItem value='Active'>Active</MenuItem> : null }
-                        { media.released ? <MenuItem value='On-hold'>On-hold</MenuItem> : null }
-                        { media.released ? <MenuItem value='Dropped'>Dropped</MenuItem> : null }
-                        { media.released ? <MenuItem value='Completed'>Completed</MenuItem> : null }
-                    </Select>
-                </FormControl>
-                { media.released ? releasedDetails : null }
-                {error ? <Alert sx={{ mt: 2, maxWidth: 400 }} severity="error">{error}</Alert> : null}
-            </Box>
-        </Modal>
-    )};
+                    <Typography sx={{ maxHeight: '50vh', overflowY: "scroll"}} id="modal-description" variant="body2" gutterBottom>
+                        {parse(`<p>${media.description}</p>`)}
+                    </Typography>
+                    <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
+                        <InputLabel id="status-label">Status</InputLabel>
+                        <Select
+                            labelId="status-select-label"
+                            id="status-select"
+                            value={status}
+                            label="Status"
+                            onChange={handleSelect}
+                            >
+                            <MenuItem value='Backlog'>Backlog</MenuItem>
+                            { media.released ? <MenuItem value='Active'>Active</MenuItem> : null }
+                            { media.released ? <MenuItem value='On-hold'>On-hold</MenuItem> : null }
+                            { media.released ? <MenuItem value='Dropped'>Dropped</MenuItem> : null }
+                            { media.released ? <MenuItem value='Completed'>Completed</MenuItem> : null }
+                        </Select>
+                    </FormControl>
+                    { media.released ? releasedDetails : null }
+                    {error ? <Alert sx={{ mt: 2, maxWidth: 400 }} severity="error">{error}</Alert> : null}
+                </Box>
+            </Modal>
+    )} else {
+        return <CircularProgress />
+    };
 };
 
 export default memo(Details);
