@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { saveMedia, userMedia } from "../features/media/mediaSlice";
+import { saveMedia } from "../features/media/mediaSlice";
+import { useGetMedia } from "../features/media/mediaHooks";
 import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Rating, Slider, Stack, Input, Alert } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { LibraryContext } from "./Library";
@@ -32,6 +33,7 @@ const Details = (props) => {
     const loadStatus = useSelector(state => state.media.load);
     
     const dispatch = useDispatch();
+    const getMedia = useGetMedia();
 
     useEffect(()=>{
         fetchMedia()
@@ -61,7 +63,7 @@ const Details = (props) => {
                 released: new Date(_.get(response.data, types[type].release_date)).getTime() < new Date().getTime(),
                 progress_max: _.get(response.data, types[type].progress_max),
                 release_date: _.get(response.data, types[type].release_date),
-                update_date: type == 'tv' ? _.get(response.data, types[type].last_air_date) : null
+                update_date: type == 'tv' ? response.data.last_air_date : null
               };
             };
         } catch (error) {
@@ -75,7 +77,7 @@ const Details = (props) => {
             progress,
             rating
         }))
-        .then(() => dispatch(userMedia()))
+        .then(() => getMedia())
         .then(() => {
             if (loadStatus == 'failed') {
                 setError('Unable to save')
@@ -123,7 +125,8 @@ const Details = (props) => {
             />
         </>
 
-    if (media) return  (
+    if (media) {
+        return  (
         <Modal
             open={openDetails}
             onClose={handleCloseDetails}
@@ -137,7 +140,7 @@ const Details = (props) => {
                     { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'Not yet released' }
                 </Typography>
                 <Typography id="latest-release-date" variant="h6" gutterBottom>
-                    { media.update_date ? 'Latest release: ' + media.update_date : null }
+                    { media.update_date ? 'Last aired: ' + media.update_date : null }
                 </Typography>
                 <Typography sx={{ maxHeight: '50vh', overflowY: "scroll"}} id="modal-description" variant="body2" gutterBottom>
                     {parse(`<p>${media.description}</p>`)}
@@ -165,7 +168,7 @@ const Details = (props) => {
                 </Fab>
             </Box>
         </Modal>
-    );
+    )};
 };
 
 export default memo(Details);
