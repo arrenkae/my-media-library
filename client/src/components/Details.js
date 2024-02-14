@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { saveMedia } from "../features/media/mediaSlice";
 import { useGetMedia } from "../features/media/mediaHooks";
-import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Rating, Slider, Stack, Input, Alert, CircularProgress, InputAdornment, OutlinedInput, FormHelperText } from '@mui/material';
+import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Rating, Slider, Stack, Alert, CircularProgress, InputAdornment, OutlinedInput, FormHelperText, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import { LibraryContext } from "./Library";
 import axios from "axios";
@@ -64,7 +64,7 @@ const Details = (props) => {
                 title: _.get(response.data, types[type].title),
                 author: type == 'book' ? response.data.volumeInfo.authors[0] : null,
                 type: type,
-                image: types[type].imageLink + _.get(response.data, types[type].image),
+                image: _.get(response.data, types[type].image) ? types[type].imageLink + _.get(response.data, types[type].image) : null,
                 description: _.get(response.data, types[type].description),
                 released: new Date(_.get(response.data, types[type].release_date)).getTime() < new Date().getTime(),
                 progress_max: _.get(response.data, types[type].progress_max),
@@ -145,7 +145,7 @@ const Details = (props) => {
                 max={media?.progress_max}
                 valueLabelDisplay="auto"
                 aria-labelledby="input-slider"
-                sx={{display: { xs: 'none', sm: 'flex' }}}
+                sx={{ mb: 1, display: { xs: 'none', sm: 'flex' }}}
             />
             <Stack spacing={1} direction={{ sm: 'column', md: 'row' }} flexDirection="flex-start" >
                 <FormControl variant="outlined">
@@ -191,23 +191,23 @@ const Details = (props) => {
                 aria-labelledby="media-details"
                 >
                 <Box sx={style}>
-                    <Typography id="modal-title" variant="h4" gutterBottom>
+                    <Typography id="modal-title" variant="h4" gutterBottom color="textPrimary">
                         {media.title}
                     </Typography>
                     {
                         type === 'book' ? 
-                        <Typography id="book-author" variant="h5" gutterBottom>
+                        <Typography id="book-author" variant="h5" gutterBottom color="textPrimary">
                             {media.author}
                         </Typography>
                         : null
                     }
-                    <Typography id="release-date" variant="h6">
+                    <Typography id="release-date" variant="h6" color="textPrimary" gutterBottom>
                         { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'Not yet released' }
                     </Typography>
-                    <Typography id="latest-release-date" variant="h6" gutterBottom>
+                    <Typography id="latest-release-date" variant="h6" color="textPrimary" gutterBottom>
                         { media.update_date ? 'Last aired: ' + media.update_date : null }
                     </Typography>
-                    <Typography sx={{ maxWidth: '70vw', maxHeight: { xs: '20vh', md: '50vh'}, overflowY: "scroll"}} id="modal-description" variant="body2" gutterBottom>
+                    <Typography sx={{ maxWidth: '70vw', maxHeight: { xs: '20vh', md: '50vh'}, overflowY: "scroll"}} id="modal-description" variant="body2" color="textPrimary" gutterBottom>
                         {media.description ? parse(`<p>${media.description}</p>`) : null}
                     </Typography>
                     <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
@@ -228,9 +228,11 @@ const Details = (props) => {
                     </FormControl>
                     { media.released ? releasedDetails : null }
                     {error ? <Alert sx={{ mt: 2, maxWidth: 400 }} severity="error">{error}</Alert> : null}
-                    <Fab color="primary" aria-label="save" onClick={save} sx={{ position: 'absolute', bottom: 40, right: 40 }}>
-                        <SaveIcon />
-                    </Fab>
+                    <Tooltip title="Save" placement="top">
+                        <Fab color="secondary" aria-label="save" onClick={save} sx={{ position: 'absolute', bottom: 40, right: 40 }}>
+                            <SaveIcon />
+                        </Fab>
+                    </Tooltip>
                 </Box>
             </Modal>
     )} else {

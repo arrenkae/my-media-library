@@ -2,11 +2,12 @@ import { useState, useEffect, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteMedia, saveMedia } from "../features/media/mediaSlice";
 import { useGetMedia } from "../features/media/mediaHooks";
-import { Card, Box, CardActions, CardContent, CardMedia, CardHeader, IconButton, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
+import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Tooltip, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { LibraryContext } from "./Library";
 import { types } from "./Library";
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 
 const LibraryCard = ({media}) => {
     const { handleOpenDetails, setOpenNotification } = useContext(LibraryContext);
@@ -20,7 +21,7 @@ const LibraryCard = ({media}) => {
     const chipColor = () => {
         switch (media.status) {
             case 'Backlog':
-                return 'secondary';
+                return 'primary';
             case 'Active':
                 return 'info';
             case 'Completed':
@@ -54,25 +55,30 @@ const LibraryCard = ({media}) => {
     
     const renderLibraryCard = 
         <Card sx={{ maxWidth: 200, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
-            <Box>
-                <CardMedia
-                    sx={{ width: 200, height: 300 }}
-                    image={types[type].imageLink + media.image}
-                    title={media.title + ' poster'}
-                />
-                <Chip label={media.status} sx={{ mt: 2, width: '80%' }} color={chipColor()} />
-            </Box>
-            <CardContent >
-                <Typography id="card-title" variant="h6" gutterBottom>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems:'center' }}>
+                { media.image ?
+                    <CardMedia
+                        sx={{ width: 200, height: 300 }}
+                        image={types[type].imageLink + media.image}
+                        title={media.title + ' poster'}
+                    /> :
+                    <Box sx={{ width: 200, height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <ImageNotSupportedIcon fontSize="large" />
+                    </Box>
+                }
+                <Chip label={media.status} sx={{ mt: 2, mb: 2, width: '80%' }} color={chipColor()} />
+                <Typography id="card-title" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
                     {media.title}
                 </Typography>
                 {   
                     type === 'book' ?
-                    <Typography id="book-author" variant="h6" gutterBottom>
+                    <Typography id="book-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
                         {media.author}
                     </Typography>
                     : null
                 }
+            </Box>
+            <CardContent >
                 <Typography variant="body2" color="text.secondary">
                     {media.progress} / {media.progress_max} {types[type].progress}
                 </Typography>
@@ -86,19 +92,23 @@ const LibraryCard = ({media}) => {
                 { media.rating != 0 ? <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly /> : null }
             </CardContent >
             <CardActions sx={{ display: 'flex', justifyContent:'flex-end' }}>
-                <IconButton
-                    aria-label="edit"
-                    onClick={() => handleOpenDetails(media.api_id)}
-                >
-                    <EditIcon />
-                </IconButton>
-                <IconButton
-                    aria-label="delete"
-                    value={media.id}
-                    onClick={handleOpenConfirmation}
+                <Tooltip title="Edit" placement="top">
+                    <IconButton
+                        aria-label="edit"
+                        onClick={() => handleOpenDetails(media.api_id)}
                     >
-                    <DeleteIcon />
-                </IconButton>
+                        <EditIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete" placement="top">
+                    <IconButton
+                        aria-label="delete"
+                        value={media.id}
+                        onClick={handleOpenConfirmation}
+                        >
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
             </CardActions>
         </Card>
 
@@ -108,10 +118,10 @@ const LibraryCard = ({media}) => {
             <Dialog
                 open={openConfirmation}
                 onClose={handleCloseConfirmation}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
+                aria-labelledby="delete-confirmation-title"
+                aria-describedby="delete-confirmation-description"
                 >
-            <DialogTitle id="alert-dialog-title">
+            <DialogTitle id="delete-confirmation-title"  color="textPrimary" sx={{ m: 2 }} >
                 Are you sure you want to delete this media?
             </DialogTitle>
             <DialogActions>

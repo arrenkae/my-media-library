@@ -24,9 +24,8 @@ const TopBar = (props) => {
                   sx={{
                     mr: 2,
                     display: { xs: 'none', md: 'flex' },
-                    fontWeight: 700,
+                    fontWeight: 600,
                     letterSpacing: '.3rem',
-                    textDecoration: 'none',
                   }}
                   >
                   My Media Library

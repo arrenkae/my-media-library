@@ -61,7 +61,7 @@ const Search = (props) => {
 
   return (
     <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
-        <Typography id="search-header" variant="h6">
+        <Typography id="search-header" variant="h6" color="textSecondary">
             Search for new {types[type].typename}
         </Typography>
         <Paper
