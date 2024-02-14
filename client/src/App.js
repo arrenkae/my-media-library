@@ -23,7 +23,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: 'Lato',
+    fontFamily: 'Ubuntu',
     h1: {
       fontFamily: 'Rubik Doodle Shadow',
     },
@@ -32,17 +32,13 @@ const theme = createTheme({
       color: '#094067'
     },
     h3: {
-      fontFamily: 'Rubik',
+      fontFamily: 'Ubuntu',
+      fontWeight: 500,
     },
     h4: {
-      fontFamily: 'Rubik',
-    },
-    h5: {
-      fontFamily: 'Poppins',
-    },
-    h6: {
-      fontFamily: 'Poppins',
-    },
+      fontFamily: 'Ubuntu',
+      fontWeight: 500
+    }
   },
 });
 

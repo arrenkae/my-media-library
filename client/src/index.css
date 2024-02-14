@@ -11,3 +11,24 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@font-face {
+	font-family: 'Ubuntu';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Ubuntu'), url(./fonts/Ubuntu-Regular.woff2) format('woff2');
+}
+
+@font-face {
+	font-family: 'Ubuntu';
+	font-style: normal;
+	font-weight: 500;
+	src: local('Ubuntu'), url(./fonts/Ubuntu-Medium.woff2) format('woff2');
+}
+
+@font-face {
+	font-family: 'Rubik Doodle Shadow';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Rubik Doodle Shadow'), url(./fonts/RubikDoodleShadow-Regular.woff2) format('woff2');
+}

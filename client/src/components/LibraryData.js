@@ -38,7 +38,7 @@ const LibraryData = (props) => {
 
     const renderLibrary = 
         <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
-            <Typography id="library-header" variant="h3" gutterBottom>
+            <Typography id="library-header" variant="h3" color="text.primary" gutterBottom>
                 My {types[type].typename}
             </Typography>
             <Stack direction={{ sm: 'column', md: 'row' }} spacing={2} sx={{ maxWidth: '90%' }}>
