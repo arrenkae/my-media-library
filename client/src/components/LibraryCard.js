@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { deleteMedia, saveMedia } from "../features/media/mediaSlice";
 import { useGetMedia } from "../features/media/mediaHooks";
-import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
+import { Card, Box, CardActions, CardContent, CardMedia, CardHeader, IconButton, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { LibraryContext } from "./Library";
@@ -54,11 +54,14 @@ const LibraryCard = ({media}) => {
     
     const renderLibraryCard = 
         <Card sx={{ maxWidth: 200, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
-            <CardMedia
-                sx={{ width: 200, height: 300 }}
-                image={types[type].imageLink + media.image}
-                title={media.title + ' poster'}
-            />
+            <Box>
+                <CardMedia
+                    sx={{ width: 200, height: 300 }}
+                    image={types[type].imageLink + media.image}
+                    title={media.title + ' poster'}
+                />
+                <Chip label={media.status} sx={{ mt: 2, width: '80%' }} color={chipColor()} />
+            </Box>
             <CardContent >
                 <Typography id="card-title" variant="h6" gutterBottom>
                     {media.title}
@@ -81,7 +84,6 @@ const LibraryCard = ({media}) => {
                     :null
                 }
                 { media.rating != 0 ? <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly /> : null }
-                <Chip label={media.status} sx={{ mt: 1 }} color={chipColor()} />
             </CardContent >
             <CardActions sx={{ display: 'flex', justifyContent:'flex-end' }}>
                 <IconButton

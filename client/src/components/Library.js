@@ -24,7 +24,8 @@ export const types = {
         description: 'overview',
         release_date: 'first_air_date',
         progress_max: 'number_of_episodes',
-        progress: 'episodes'
+        progress: 'episodes',
+        verb: 'watch'
     },
     movie: {
         typename: 'movies',
@@ -38,7 +39,8 @@ export const types = {
         description: 'overview',
         release_date: 'release_date',
         progress_max: 'runtime',
-        progress: 'minutes'
+        progress: 'minutes',
+        verb: 'watch'
     },
     book: {
         typename: 'books',
@@ -52,7 +54,8 @@ export const types = {
         description: 'volumeInfo.description',
         release_date: 'volumeInfo.publishedDate',
         progress_max: 'volumeInfo.pageCount',
-        progress: 'pages'
+        progress: 'pages',
+        verb: 'read'
     }
   }
 
