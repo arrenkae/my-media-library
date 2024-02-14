@@ -8,12 +8,13 @@ import { types } from './Library';
 
 const LibraryData = (props) => {
     const { library } = useContext(LibraryContext);
+    const fullLibrary = useSelector(state => state.media.library);
     const loadStatus = useSelector(state => state.media.load);
-    const dispatch = useDispatch();
+
     const type = useSelector(state => state.media.type);
     const status = useSelector(state => state.media.status);
     const sort = useSelector(state => state.media.sort);
-    const reversed = useSelector(state => state.media.reversed);
+    const ascending = useSelector(state => state.media.ascending);
 
     const getMedia = useGetMedia();
     const filterStatus = useFilterStatus();
@@ -30,11 +31,14 @@ const LibraryData = (props) => {
 
     const handleSort = (e) => {
         selectSort(e.target.value);
+        if ((e.target.value === 'name' && ascending === false) || (e.target.value != 'name' && ascending === true)) {
+            reverseSort();
+        }
     }
 
     const renderLibrary = 
         <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
-            <Typography id="library-header" variant="h4" gutterBottom>
+            <Typography id="library-header" variant="h3" gutterBottom>
                 My {types[type].typename}
             </Typography>
             <Stack direction={{ sm: 'column', md: 'row' }} spacing={2} sx={{ maxWidth: '90%' }}>
@@ -68,19 +72,19 @@ const LibraryData = (props) => {
                         label="Sort by"
                         onChange={handleSort}
                         >
-                        <MenuItem value='updated'>Last updated</MenuItem>
+                        <MenuItem value='updated'>Updated</MenuItem>
                         <MenuItem value='name'>Name</MenuItem>
                         <MenuItem value='rating'>Rating</MenuItem>
-                        <MenuItem value='release'>Release date</MenuItem>
+                        <MenuItem value='release'>Released</MenuItem>
                     </Select>
                 </FormControl>
                 <FormControlLabel control={
                     <Switch
-                    checked={reversed}
+                    checked={ascending}
                     onChange={reverseSort}
                     inputProps={{ 'aria-label': 'reverse-sorting' }}
                     />
-                }label="Reverse sort" />
+                }label={ ascending ? 'Ascending' : 'Descending'} />
             </Stack>
             { library?.length > 0 ?
             <Box sx={{ flexGrow: 1, mt: 5 }}>
@@ -93,9 +97,18 @@ const LibraryData = (props) => {
                 </Grid>
             </Box>
             : 
-            <Typography id="empty-library" variant="h5" sx={{mt: 5}}>
-                Nothing to see here!
-            </Typography>
+            fullLibrary.length > 0 ?
+                <Typography id="no-filter-results-header" variant="h5" color="textPrimary">
+                    Nothing to see here!
+                </Typography> : 
+                <>
+                <Typography id="empty-library-header" variant="h5" color="textPrimary">
+                    Your library is empty!
+                </Typography>
+                <Typography id="empty-library-text" variant="paragraph" color="textSecondary">
+                    Start filling it by searching for new media.
+                </Typography>
+                </>
             }
         </Stack>
 

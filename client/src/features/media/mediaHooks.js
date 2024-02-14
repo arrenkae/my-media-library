@@ -1,10 +1,10 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { useSelector, useDispatch } from "react-redux";
 import { useCallback } from 'react';
-import { library, type, filterType, status, sort, filterStatus, selectSort, getMedia, reverseSort, reversed } from './mediaSlice';
+import { library, type, filterType, status, sort, filterStatus, selectSort, getMedia, reverseSort, ascending } from './mediaSlice';
 
 export const useLibrarySelect = () => {
-    const selectorLibrary = createSelector([library, type, status, sort, reversed], (library, type, status, sort, reversed) => {
+    const selectorLibrary = createSelector([library, type, status, sort, ascending], (library, type, status, sort, ascending) => {
         let filtering;
         if (status == 'All') {
             filtering = (media) => media.type == type;
@@ -13,13 +13,13 @@ export const useLibrarySelect = () => {
         }
         switch (sort) {
             case 'updated':
-                return library.filter(filtering).toSorted((a, b) => new Date(b.user_update) - new Date(a.user_update))[reversed ? 'toReversed' : 'toSorted']();          
+                return library.filter(filtering).toSorted((a, b) => new Date(a.user_update) - new Date(b.user_update))[ascending ? 'toSorted' : 'toReversed']();          
             case 'name':
-                return library.filter(filtering).toSorted((a, b) => a.title.localeCompare(b.title))[reversed ? 'toReversed' : 'toSorted']();
+                return library.filter(filtering).toSorted((a, b) => a.title.localeCompare(b.title))[ascending ? 'toSorted' : 'toReversed']();
             case 'rating':
-                return library.filter(filtering).toSorted((a, b) => b.rating - a.rating)[reversed ? 'toReversed' : 'toSorted']();
+                return library.filter(filtering).toSorted((a, b) => a.rating - b.rating)[ascending ? 'toSorted' : 'toReversed']();
             case 'release':
-                return library.filter(filtering).toSorted((a, b) => new Date(b.release_date) - new Date(a.release_date))[reversed ? 'toReversed' : 'toSorted']();
+                return library.filter(filtering).toSorted((a, b) => new Date(a.release_date) - new Date(b.release_date))[ascending ? 'toSorted' : 'toReversed']();
         }
     });
     return useSelector(selectorLibrary);

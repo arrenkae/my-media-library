@@ -50,12 +50,12 @@ const LoginRegister = ({page}) => {
     }
 
     const renderLoginRegister =
-        <Box sx={{m:5}}>
+        <Box sx={{m:5, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
             <Typography id="app-header" variant="h2" gutterBottom>
                 My Media Library
             </Typography>
-            <Typography id="login-header" variant="h4" gutterBottom>
-                {page}
+            <Typography id="app-description" variant="h5" color="textSecondary" sx={{display: { xs: 'none', md: 'flex' }, maxWidth: 600}} gutterBottom>
+                Create and manage your personal library of TV shows, movies and books.
             </Typography>
             <Box component={'form'} sx={{m:2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}} noValidate autoComplete="off">
                 <TextField
@@ -83,10 +83,10 @@ const LoginRegister = ({page}) => {
             <Button variant="contained" type="submit" onClick={loginregister} sx={{mb:2}} >{page}</Button>
             {
                 page === 'Login' ?
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" color="textSecondary" gutterBottom>
                     New user? <Link to='/register'>Register</Link>
                 </Typography> :
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" color="textSecondary" gutterBottom>
                     Existing user? <Link to='/login'>Log in</Link>
                 </Typography>
             }

@@ -10,7 +10,7 @@ const initialState = {
     type: 'tv',
     status: 'All',
     sort: 'updated',
-    reversed: false
+    ascending: false
 };
 
 export const getMedia = createAsyncThunk("media/library", async() => {
@@ -48,7 +48,7 @@ const mediaSlice = createSlice({
       state.sort = action.payload;
     },
     reverseSort: (state, action) => {
-      state.reversed = !state.reversed;
+      state.ascending = !state.ascending;
     },
   },
   extraReducers(builder) {
@@ -87,7 +87,7 @@ export const library = (state) => state.media.library;
 export const type = (state) => state.media.type;
 export const status = (state) => state.media.status;
 export const sort = (state) => state.media.sort;
-export const reversed = (state) => state.media.reversed;
+export const ascending = (state) => state.media.ascending;
 
 export const { filterType, filterStatus, selectSort, reverseSort } = mediaSlice.actions;
 export default mediaSlice.reducer;

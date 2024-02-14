@@ -9,7 +9,7 @@ const SearchData = (props) => {
 
     const renderSearch = 
         <Stack spacing={2} direction="column" sx={{ alignItems: { xs: 'flex-start', md: 'center' }}} >
-            <Typography id="search-results-header" sx={{typography: { xs: 'h5', md: 'h4' }}}>
+            <Typography id="search-results-header" color="textPrimary" sx={{typography: { xs: 'h5', md: 'h4' }}}>
                     Search results for: {searchResults.query}
             </Typography>
             <Box sx={{ m: 5 }}>
