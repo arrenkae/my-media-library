@@ -11,15 +11,16 @@ import _ from 'lodash';
 import parse from 'html-react-parser';
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: { xs: 'fixed', sm: 'absolute'},
+    top: { xs: '', sm: '50%'},
+    left: { xs: '', sm: '50%'},
+    transform: { xs: '', sm: 'translate(-50%, -50%)'},
     maxWidth: 500,
+    maxHeight: '80vh',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 6,
-    borderRadius: 2
+    borderRadius: 2,
 };
 
 const Details = (props) => {
@@ -69,7 +70,7 @@ const Details = (props) => {
                 progress_max: _.get(response.data, types[type].progress_max),
                 progress_seasons_max: type == 'tv' ? response.data.number_of_seasons : null,
                 release_date: _.get(response.data, types[type].release_date),
-                update_date: type == 'tv' ? _.get(response.data, types[type].last_air_date) : null
+                update_date: type == 'tv' ? response.data.last_air_date : null
               };
             };
         } catch (error) {
@@ -112,14 +113,16 @@ const Details = (props) => {
         }
     };
 
+    const handleProgressChange = (e) => {
+        setProgress(e.target.value === '' ? 0 : Number(e.target.value));
+    }
+
     const handleSliderChange = (e) => {
         setProgress(e.target.value);
     }
 
     const handleSeasonChange = (e) => {
-        if (0 <= Number(e.target.value) <= media?.progress_seasons_max) {
-            setProgressSeasons(e.target.value);
-        }
+        setProgressSeasons(e.target.value === '' ? 0 : Number(e.target.value));
     }
 
     const releasedDetails = 
@@ -142,22 +145,42 @@ const Details = (props) => {
                 max={media?.progress_max}
                 valueLabelDisplay="auto"
                 aria-labelledby="input-slider"
+                sx={{display: { xs: 'none', sm: 'flex' }}}
             />
-            {
-                type === 'tv' ?
-                    <FormControl sx={{ m: 1, width: '11ch' }} variant="outlined">
-                        <OutlinedInput
-                            id="season-number"
-                            type="number"
-                            inputProps={{ min: 0, max: media?.progress_seasons_max }}
-                            value={progress_seasons}
-                            endAdornment={<InputAdornment position="end"> / {media?.progress_seasons_max}</InputAdornment>}
-                            onChange={handleSeasonChange}
-                        />
-                        <FormHelperText id="season-helper-text">Seasons</FormHelperText>
-                    </FormControl>
-                : null
-            }
+            <Stack spacing={1} direction={{ sm: 'column', md: 'row' }} flexDirection="flex-start" >
+                <FormControl variant="outlined">
+                    <OutlinedInput
+                        id="progress-number-input"
+                        value={progress}
+                        onChange={handleProgressChange}
+                        endAdornment={<InputAdornment position="end"> / {media?.progress_max}</InputAdornment>}
+                        inputProps={{
+                        min: 0,
+                        max: media?.progress_max,
+                        type: 'number',
+                        'aria-labelledby': 'input-slider',
+                        }}
+                        sx={{ maxWidth: '14ch' }}
+                    />
+                    <FormHelperText id="season-helper-text">{types[type].progress}</FormHelperText>
+                </FormControl>
+                {
+                    type === 'tv' ?
+                        <FormControl variant="outlined">
+                            <OutlinedInput
+                                id="season-number-input"
+                                type="number"
+                                inputProps={{ min: 0, max: media?.progress_seasons_max }}
+                                value={progress_seasons}
+                                endAdornment={<InputAdornment position="end"> / {media?.progress_seasons_max}</InputAdornment>}
+                                onChange={handleSeasonChange}
+                                sx={{ maxWidth: '12ch' }}
+                            />
+                            <FormHelperText id="season-helper-text">seasons</FormHelperText>
+                        </FormControl>
+                    : null
+                }
+            </Stack>
         </>
 
     if (media) {
@@ -165,17 +188,12 @@ const Details = (props) => {
             <Modal
                 open={openDetails}
                 onClose={handleCloseDetails}
-                aria-labelledby="media details"
+                aria-labelledby="media-details"
                 >
                 <Box sx={style}>
-                    <Stack direction="row" justifyContent="space-between">
-                        <Typography id="modal-title" variant="h4" sx={{ maxWidth: 420}} gutterBottom>
-                            {media.title}
-                        </Typography>
-                        <Fab color="primary" aria-label="save" onClick={save}>
-                            <SaveIcon />
-                        </Fab>
-                    </Stack>
+                    <Typography id="modal-title" variant="h4" gutterBottom>
+                        {media.title}
+                    </Typography>
                     {
                         type === 'book' ? 
                         <Typography id="book-author" variant="h5" gutterBottom>
@@ -189,8 +207,8 @@ const Details = (props) => {
                     <Typography id="latest-release-date" variant="h6" gutterBottom>
                         { media.update_date ? 'Last aired: ' + media.update_date : null }
                     </Typography>
-                    <Typography sx={{ maxHeight: '50vh', overflowY: "scroll"}} id="modal-description" variant="body2" gutterBottom>
-                        {parse(`<p>${media.description}</p>`)}
+                    <Typography sx={{ maxWidth: '70vw', maxHeight: { xs: '20vh', md: '50vh'}, overflowY: "scroll"}} id="modal-description" variant="body2" gutterBottom>
+                        {media.description ? parse(`<p>${media.description}</p>`) : null}
                     </Typography>
                     <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
                         <InputLabel id="status-label">Status</InputLabel>
@@ -210,6 +228,9 @@ const Details = (props) => {
                     </FormControl>
                     { media.released ? releasedDetails : null }
                     {error ? <Alert sx={{ mt: 2, maxWidth: 400 }} severity="error">{error}</Alert> : null}
+                    <Fab color="primary" aria-label="save" onClick={save} sx={{ position: 'absolute', bottom: 40, right: 40 }}>
+                        <SaveIcon />
+                    </Fab>
                 </Box>
             </Modal>
     )} else {

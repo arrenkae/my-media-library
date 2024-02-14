@@ -80,7 +80,7 @@ const LoginRegister = ({page}) => {
                 <Alert severity='error'>{message}</Alert>
                 : null }
             </Box>
-            <Button variant="contained" onClick={loginregister} sx={{mb:2}}>{page}</Button>
+            <Button variant="contained" type="submit" onClick={loginregister} sx={{mb:2}} >{page}</Button>
             {
                 page === 'Login' ?
                 <Typography variant="h6" gutterBottom>

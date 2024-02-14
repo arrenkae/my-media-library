@@ -4,7 +4,7 @@ import { deleteMedia, saveMedia } from "../features/media/mediaSlice";
 import { useGetMedia } from "../features/media/mediaHooks";
 import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { LibraryContext } from "./Library";
 import { types } from "./Library";
 
@@ -53,7 +53,7 @@ const LibraryCard = ({media}) => {
     }
     
     const renderLibraryCard = 
-        <Card sx={{ maxWidth: 200, minHeight: 500, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
+        <Card sx={{ maxWidth: 200, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
             <CardMedia
                 sx={{ width: 200, height: 300 }}
                 image={types[type].imageLink + media.image}
@@ -95,7 +95,7 @@ const LibraryCard = ({media}) => {
                     value={media.id}
                     onClick={handleOpenConfirmation}
                     >
-                    <ClearIcon />
+                    <DeleteIcon />
                 </IconButton>
             </CardActions>
         </Card>

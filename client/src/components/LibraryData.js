@@ -35,7 +35,7 @@ const LibraryData = (props) => {
             <Typography id="library-header" variant="h4" gutterBottom>
                 My {types[type].typename}
             </Typography>
-            <Stack direction="row" spacing={2}>
+            <Stack direction={{ sm: 'column', md: 'row' }} spacing={2} sx={{ maxWidth: '90%' }}>
                 <ToggleButtonGroup
                     color="primary"
                     value={status}
@@ -43,6 +43,12 @@ const LibraryData = (props) => {
                     onChange={handleStatusChange}
                     aria-label="status-filter"
                     gutterBottom
+                    sx={{ 
+                        border: { xs: 1, sm: '' },
+                        borderColor: { xs: 'divider', sm: '' },
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        mb: { xs: 2, sm: 0 },
+                    }}
                     >
                     <ToggleButton value="All">All</ToggleButton>
                     <ToggleButton value="Active">Active</ToggleButton>
@@ -52,7 +58,7 @@ const LibraryData = (props) => {
                     <ToggleButton value="Dropped">Dropped</ToggleButton>
                 </ToggleButtonGroup>
                 <FormControl sx={{ m: 1, minWidth: 120 }} >
-                    <InputLabel id="sorting-select-label">Sort by</InputLabel>
+                    <InputLabel id="sorting-select-label" >Sort by</InputLabel>
                     <Select
                         labelId="sorting-select-label"
                         id="sorting-select"
@@ -71,7 +77,7 @@ const LibraryData = (props) => {
             <Box sx={{ flexGrow: 1, mt: 5 }}>
                 <Grid container spacing={3}>
                     {library.map(element =>
-                        <Grid item key={element.id}>
+                        <Grid item key={element.id} style={{display: 'flex'}} >
                             <LibraryCard media={element} />
                         </Grid>
                     )}

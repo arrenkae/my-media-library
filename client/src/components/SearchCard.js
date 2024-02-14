@@ -1,6 +1,6 @@
 import { useState, useContext, memo } from "react";
 import { useSelector } from "react-redux";
-import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Fab, Typography, Chip, Rating } from '@mui/material';
+import { Card, Box, CardHeader, CardContent, CardMedia, IconButton, Fab, Typography, Chip, Rating } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import LibraryCard from "./LibraryCard";
 import { LibraryContext } from "./Library";
@@ -19,10 +19,12 @@ const SearchCard = ({media}) => {
                 image={types[type].imageLink + _.get(media, types[type].image)}
                 title={_.get(media, types[type].title) + ' image'}
             />
-            <CardContent >
+            <CardContent>
                 <Typography id="card-title" variant="h6" gutterBottom>
-                    {_.get(media, types[type].title)}
+                        {_.get(media, types[type].title)}
                 </Typography>
+            </CardContent >
+            <CardContent sx={{ display: 'flex', justifyContent: 'flex-end' }}>    
                 <Fab size="small" color="primary" aria-label="add" onClick={() => handleOpenDetails(media.id)}>
                     <AddIcon />
                 </Fab>

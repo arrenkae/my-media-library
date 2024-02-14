@@ -38,7 +38,7 @@ const Search = (props) => {
 
   const showError = (message) => {
     setError(message);
-    setTimeout(() => { setError() }, 8000);
+    setTimeout(() => { setError() }, 5000);
   }
 
   const search = async() => {
@@ -66,7 +66,7 @@ const Search = (props) => {
         </Typography>
         <Paper
           component="form"
-          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', maxWidth: 400 }}
+          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', maxWidth: { xs: '90%', sm: 400 }, }}
           >
           <SearchIcon sx={{ ml: 1 }} />
           <InputBase
@@ -75,7 +75,10 @@ const Search = (props) => {
             onChange={handleQuery}
             value={query}
           />
-          <Button variant="text" onClick={handleSearch}>Search</Button>
+          <Button variant="text" type="submit" onClick={(e) => {
+            e.preventDefault();
+            handleSearch();
+          }}>Search</Button>
           <Button variant="text" onClick={handleClear}>Clear</Button>
         </Paper>
         {error ? <Alert variant="outlined" sx={{ maxWidth: 380 }} severity="error">{error}</Alert> : null}

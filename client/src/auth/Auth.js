@@ -1,3 +1,4 @@
+import { Navigate } from 'react-router-dom';
 import { useEffect } from "react";
 import { CircularProgress } from '@mui/material';
 import { useSelector, useDispatch } from "react-redux";
@@ -13,7 +14,7 @@ const Auth = (props) => {
         dispatch(verify(token));
     }, [])
 
-    return token ? props.children : loadStatus == 'failed' ? <h1>Not authorized</h1> : null;
+    return token ? props.children : loadStatus == 'failed' ? <Navigate to="/login" /> : <CircularProgress />;
 }
 
 export default Auth;
