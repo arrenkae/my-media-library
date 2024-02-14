@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useContext, memo } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { Grid, Box, Typography, CircularProgress, ToggleButton, ToggleButtonGroup, Stack, Select, InputLabel, MenuItem, FormControl, LinearProgress } from '@mui/material';
+import { Grid, Box, Typography, ToggleButton, ToggleButtonGroup, Stack, Select, InputLabel, MenuItem, FormControl, LinearProgress, Switch, FormControlLabel } from '@mui/material';
 import LibraryCard from './LibraryCard';
-import { useGetMedia, useFilterStatus, useSelectSort } from "../features/media/mediaHooks";
+import { useGetMedia, useFilterStatus, useSelectSort, useReverseSort } from "../features/media/mediaHooks";
 import { LibraryContext } from "./Library";
 import { types } from './Library';
 
@@ -13,10 +13,12 @@ const LibraryData = (props) => {
     const type = useSelector(state => state.media.type);
     const status = useSelector(state => state.media.status);
     const sort = useSelector(state => state.media.sort);
+    const reversed = useSelector(state => state.media.reversed);
 
     const getMedia = useGetMedia();
     const filterStatus = useFilterStatus();
     const selectSort = useSelectSort();
+    const reverseSort = useReverseSort();
 
     useEffect(()=>{
         getMedia();
@@ -72,6 +74,13 @@ const LibraryData = (props) => {
                         <MenuItem value='release'>Release date</MenuItem>
                     </Select>
                 </FormControl>
+                <FormControlLabel control={
+                    <Switch
+                    checked={reversed}
+                    onChange={reverseSort}
+                    inputProps={{ 'aria-label': 'reverse-sorting' }}
+                    />
+                }label="Reverse sort" />
             </Stack>
             { library?.length > 0 ?
             <Box sx={{ flexGrow: 1, mt: 5 }}>

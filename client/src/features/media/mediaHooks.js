@@ -1,10 +1,10 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { useSelector, useDispatch } from "react-redux";
 import { useCallback } from 'react';
-import { library, type, filterType, status, sort, filterStatus, selectSort, getMedia, reverseSort, reverse } from './mediaSlice';
+import { library, type, filterType, status, sort, filterStatus, selectSort, getMedia, reverseSort, reversed } from './mediaSlice';
 
 export const useLibrarySelect = () => {
-    const sellectorLibrary = createSelector([library, type, status, sort], (library, type, status, sort) => {
+    const selectorLibrary = createSelector([library, type, status, sort, reversed], (library, type, status, sort, reversed) => {
         let filtering;
         if (status == 'All') {
             filtering = (media) => media.type == type;
@@ -13,16 +13,16 @@ export const useLibrarySelect = () => {
         }
         switch (sort) {
             case 'updated':
-                return library.filter(filtering).toReversed();            
+                return library.filter(filtering).toSorted((a, b) => new Date(b.user_update) - new Date(a.user_update))[reversed ? 'toReversed' : 'toSorted']();          
             case 'name':
-                return library.filter(filtering).toSorted((a, b) => a.title.localeCompare(b.title));
+                return library.filter(filtering).toSorted((a, b) => a.title.localeCompare(b.title))[reversed ? 'toReversed' : 'toSorted']();
             case 'rating':
-                return library.filter(filtering).toSorted((a, b) => b.rating - a.rating);
+                return library.filter(filtering).toSorted((a, b) => b.rating - a.rating)[reversed ? 'toReversed' : 'toSorted']();
             case 'release':
-                return library.filter(filtering).toSorted((a, b) => new Date(b.release_date) - new Date(a.release_date));
+                return library.filter(filtering).toSorted((a, b) => new Date(b.release_date) - new Date(a.release_date))[reversed ? 'toReversed' : 'toSorted']();
         }
     });
-    return useSelector(sellectorLibrary);
+    return useSelector(selectorLibrary);
 };
 
 export const useGetMedia = () => {
@@ -51,4 +51,11 @@ export const useSelectSort = () => {
     return useCallback((sort) => {
         dispatch(selectSort(sort));
     }, [dispatch, selectSort])
+}
+
+export const useReverseSort = () => {
+    const dispatch = useDispatch();
+    return useCallback(() => {
+        dispatch(reverseSort());
+    }, [dispatch, reverseSort])
 }
