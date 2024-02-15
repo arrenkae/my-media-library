@@ -6,7 +6,7 @@ import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select,
 import SaveIcon from '@mui/icons-material/Save';
 import { LibraryContext } from "./Library";
 import axios from "axios";
-import { types } from "./Library";
+import { types, statusNames } from "./Library";
 import _ from 'lodash';
 import parse from 'html-react-parser';
 
@@ -28,7 +28,7 @@ const Details = (props) => {
     const fullLibrary = useSelector(state => state.media.library);
     const type = useSelector(state => state.media.type);
     const [media, setMedia] = useState();
-    const [status, setStatus] = useState('Backlog');
+    const [status, setStatus] = useState('backlog');
     const [progress, setProgress] = useState(0);
     const [progress_seasons, setProgressSeasons] = useState(0);
     const [rating, setRating] = useState(0);
@@ -207,7 +207,7 @@ const Details = (props) => {
                     <Typography id="latest-release-date" variant="h6" color="textPrimary" gutterBottom>
                         { media.update_date ? 'Last aired: ' + media.update_date : null }
                     </Typography>
-                    <Typography sx={{ maxWidth: '70vw', maxHeight: { xs: '20vh', md: '50vh'}, overflowY: "scroll"}} id="modal-description" variant="body2" color="textPrimary" gutterBottom>
+                    <Typography sx={{ maxWidth: '70vw', maxHeight: { xs: '20vh', md: '40vh'}, overflowY: "scroll"}} id="modal-description" variant="body2" color="textPrimary" gutterBottom>
                         {media.description ? parse(`<p>${media.description}</p>`) : null}
                     </Typography>
                     <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
@@ -219,11 +219,10 @@ const Details = (props) => {
                             label="Status"
                             onChange={handleSelect}
                             >
-                            <MenuItem value='Backlog'>Backlog</MenuItem>
-                            { media.released ? <MenuItem value='Active'>Active</MenuItem> : null }
-                            { media.released ? <MenuItem value='On-hold'>On-hold</MenuItem> : null }
-                            { media.released ? <MenuItem value='Dropped'>Dropped</MenuItem> : null }
-                            { media.released ? <MenuItem value='Completed'>Completed</MenuItem> : null }
+                            { media.released ? 
+                                Object.keys(statusNames).map(status => <MenuItem value={status}>{statusNames[status].replace('verb', types[type].verb)}</MenuItem>)
+                                : <MenuItem value='backlog'>{statusNames.backlog.replace('verb', types[type].verb)}</MenuItem>
+                            }
                         </Select>
                     </FormControl>
                     { media.released ? releasedDetails : null }

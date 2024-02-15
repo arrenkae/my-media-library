@@ -8,7 +8,7 @@ const initialState = {
     library: [],
     load: 'idle',
     type: 'tv',
-    status: 'All',
+    status: 'all',
     sort: 'updated',
     ascending: false
 };

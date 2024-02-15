@@ -25,7 +25,7 @@ export const types = {
         release_date: 'first_air_date',
         progress_max: 'number_of_episodes',
         progress: 'episodes',
-        verb: 'watch'
+        verb: 'Watch'
     },
     movie: {
         typename: 'movies',
@@ -40,7 +40,7 @@ export const types = {
         release_date: 'release_date',
         progress_max: 'runtime',
         progress: 'minutes',
-        verb: 'watch'
+        verb: 'Watch'
     },
     book: {
         typename: 'books',
@@ -55,13 +55,20 @@ export const types = {
         release_date: 'volumeInfo.publishedDate',
         progress_max: 'volumeInfo.pageCount',
         progress: 'pages',
-        verb: 'read'
+        verb: 'Read'
     }
+  }
+
+  export const statusNames = {
+    active: 'verbing',
+    backlog: 'Plan to verb',
+    onhold: 'On-hold',
+    completed: 'Completed',
+    dropped: 'Dropped'
   }
 
 const Library = (props) => {
     const library = useLibrarySelect();
-    const user = useSelector(state => state.users.user);
     const type = useSelector(state => state.media.type);
     const [searchResults, setSearchResults] = useState([]);
     const [openDetails, setOpenDetails] = useState(false);

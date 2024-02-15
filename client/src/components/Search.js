@@ -60,30 +60,32 @@ const Search = (props) => {
   };
 
   return (
-    <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
-        <Typography id="search-header" variant="h6" color="textSecondary">
-            Search for new {types[type].typename}
-        </Typography>
-        <Paper
-          component="form"
-          sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', maxWidth: { xs: '90%', sm: 400 }, }}
-          >
-          <SearchIcon sx={{ ml: 1 }} />
-          <InputBase
-            sx={{ ml: 1, flex: 1 }}
-            inputProps={{ 'aria-label': 'search new media' }}
-            onChange={handleQuery}
-            value={query}
-          />
-          <Button variant="text" type="submit" onClick={(e) => {
-            e.preventDefault();
-            handleSearch();
-          }}>Search</Button>
-          <Button variant="text" onClick={handleClear}>Clear</Button>
-        </Paper>
-        {error ? <Alert variant="outlined" sx={{ maxWidth: 380 }} severity="error">{error}</Alert> : null}
-        {searchResults ? <SearchData /> : null}
-    </Stack>
+    <>
+      <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
+          <Typography id="search-header" variant="h6" color="textSecondary">
+              Search for new {types[type].typename}
+          </Typography>
+          <Paper
+            component="form"
+            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', maxWidth: { xs: '90%', sm: 400 }, }}
+            >
+            <SearchIcon sx={{ ml: 1 }} />
+            <InputBase
+              sx={{ ml: 1, flex: 1 }}
+              inputProps={{ 'aria-label': 'search new media' }}
+              onChange={handleQuery}
+              value={query}
+            />
+            <Button variant="text" type="submit" onClick={(e) => {
+              e.preventDefault();
+              handleSearch();
+            }}>Search</Button>
+            <Button variant="text" onClick={handleClear}>Clear</Button>
+          </Paper>
+          {error ? <Alert variant="outlined" sx={{ maxWidth: 380 }} severity="error">{error}</Alert> : null}
+      </Stack>
+      {searchResults ? <SearchData /> : null}
+    </>
   );
 };
 

@@ -6,7 +6,7 @@ import { library, type, filterType, status, sort, filterStatus, selectSort, getM
 export const useLibrarySelect = () => {
     const selectorLibrary = createSelector([library, type, status, sort, ascending], (library, type, status, sort, ascending) => {
         let filtering;
-        if (status == 'All') {
+        if (status == 'all') {
             filtering = (media) => media.type == type;
         } else {
             filtering = (media) => media.type == type && media.status == status;

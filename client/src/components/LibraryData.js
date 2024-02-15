@@ -5,6 +5,7 @@ import LibraryCard from './LibraryCard';
 import { useGetMedia, useFilterStatus, useSelectSort, useReverseSort } from "../features/media/mediaHooks";
 import { LibraryContext } from "./Library";
 import { types } from './Library';
+import { statusNames } from './Library';
 
 const LibraryData = (props) => {
     const { library } = useContext(LibraryContext);
@@ -56,12 +57,15 @@ const LibraryData = (props) => {
                         mb: { xs: 2, sm: 0 },
                     }}
                     >
-                    <ToggleButton value="All">All</ToggleButton>
-                    <ToggleButton value="Active">Active</ToggleButton>
-                    <ToggleButton value="Backlog">Backlog</ToggleButton>
-                    <ToggleButton value="On-hold">On-hold</ToggleButton>
-                    <ToggleButton value="Completed">Completed</ToggleButton>
-                    <ToggleButton value="Dropped">Dropped</ToggleButton>
+                    <ToggleButton value="all">All</ToggleButton>
+                    {
+                        Object.keys(statusNames).map(status => <ToggleButton value={status}>{statusNames[status].replace('verb', types[type].verb)}</ToggleButton>)
+                    }
+                    {/* <ToggleButton value="active">{types[type].verb + 'ing'}</ToggleButton>
+                    <ToggleButton value="backlog">{'Plan to ' + types[type].verb.toLowerCase()}</ToggleButton>
+                    <ToggleButton value="onhold">On-hold</ToggleButton>
+                    <ToggleButton value="completed">Completed</ToggleButton>
+                    <ToggleButton value="dropped">Dropped</ToggleButton> */}
                 </ToggleButtonGroup>
                 <FormControl sx={{ m: 1, minWidth: 120 }} >
                     <InputLabel id="sorting-select-label" >Sort by</InputLabel>

@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { LibraryContext } from "./Library";
 import { types } from "./Library";
+import { statusNames } from "./Library";
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 
 const LibraryCard = ({media}) => {
@@ -20,15 +21,15 @@ const LibraryCard = ({media}) => {
 
     const chipColor = () => {
         switch (media.status) {
-            case 'Backlog':
+            case 'backlog':
                 return 'primary';
-            case 'Active':
+            case 'active':
                 return 'info';
-            case 'Completed':
+            case 'completed':
                 return 'success';
-            case 'On-hold':
+            case 'onhold':
                 return 'warning';
-            case 'Dropped':
+            case 'dropped':
                 return 'error';
             default:
                 return 'primary';
@@ -66,7 +67,7 @@ const LibraryCard = ({media}) => {
                         <ImageNotSupportedIcon fontSize="large" />
                     </Box>
                 }
-                <Chip label={media.status} sx={{ mt: 2, mb: 2, width: '80%' }} color={chipColor()} />
+                <Chip label={statusNames[media.status].replace('verb', types[type].verb)} sx={{ mt: 2, mb: 2, width: '80%' }} color={chipColor()} />
                 <Typography id="card-title" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
                     {media.title}
                 </Typography>

@@ -8,8 +8,8 @@ const SearchData = (props) => {
     const { searchResults } = useContext(LibraryContext);
 
     const renderSearch = 
-        <Stack spacing={2} direction="column" sx={{ alignItems: { xs: 'flex-start', md: 'center' }}} >
-            <Typography id="search-results-header" color="textPrimary" sx={{typography: { xs: 'h5', md: 'h4' }}}>
+        <>
+            <Typography id="search-results-header" color="textPrimary" sx={{typography: { xs: 'h5', md: 'h4' }, textAlign: { xs: 'left', md: 'center' }, ml: { xs: 5, md: 0 }}}>
                     Search results for: {searchResults.query}
             </Typography>
             <Box sx={{ m: 5 }}>
@@ -21,7 +21,7 @@ const SearchData = (props) => {
                     )}
                 </Grid>
             </Box>
-        </Stack>
+        </>
 
     return (
         searchResults.results?.length > 0 ? renderSearch : null
