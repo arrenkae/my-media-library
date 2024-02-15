@@ -1,16 +1,15 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { useSelector, useDispatch } from "react-redux";
 import { useCallback } from 'react';
-import { library, type, filterType, status, sort, filterStatus, selectSort, getMedia, reverseSort, ascending } from './mediaSlice';
+import { library, type, filterType, status, sort, filterStatus, selectSort, getMedia, reverseSort, ascending, searchLibrary, search } from './mediaSlice';
 
 export const useLibrarySelect = () => {
-    const selectorLibrary = createSelector([library, type, status, sort, ascending], (library, type, status, sort, ascending) => {
-        let filtering;
-        if (status == 'all') {
-            filtering = (media) => media.type == type;
-        } else {
-            filtering = (media) => media.type == type && media.status == status;
-        }
+    const selectorLibrary = createSelector([library, type, status, search, sort, ascending], (library, type, status, search, sort, ascending) => {
+        const filtering = (media) => {
+            return media.type == type && 
+            ( search ? media.title.toLowerCase().includes(search.toLowerCase()) : true ) &&
+            ( status != 'all' ? media.status == status : true )
+        };
         switch (sort) {
             case 'updated':
                 return library.filter(filtering).toSorted((a, b) => new Date(a.user_update) - new Date(b.user_update))[ascending ? 'toSorted' : 'toReversed']();          
@@ -58,4 +57,11 @@ export const useReverseSort = () => {
     return useCallback(() => {
         dispatch(reverseSort());
     }, [dispatch, reverseSort])
+}
+
+export const useSearchLibrary = () => {
+    const dispatch = useDispatch();
+    return useCallback((query) => {
+        dispatch(searchLibrary(query));
+    }, [dispatch, searchLibrary])
 }

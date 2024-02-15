@@ -9,6 +9,7 @@ const initialState = {
     load: 'idle',
     type: 'tv',
     status: 'all',
+    search: '',
     sort: 'updated',
     ascending: false
 };
@@ -50,6 +51,9 @@ const mediaSlice = createSlice({
     reverseSort: (state, action) => {
       state.ascending = !state.ascending;
     },
+    searchLibrary: (state, action) => {
+      state.search = action.payload;
+    },
   },
   extraReducers(builder) {
     builder.addCase(getMedia.pending, (state, action) => {
@@ -86,8 +90,9 @@ const mediaSlice = createSlice({
 export const library = (state) => state.media.library;
 export const type = (state) => state.media.type;
 export const status = (state) => state.media.status;
+export const search = (state) => state.media.search;
 export const sort = (state) => state.media.sort;
 export const ascending = (state) => state.media.ascending;
 
-export const { filterType, filterStatus, selectSort, reverseSort } = mediaSlice.actions;
+export const { filterType, filterStatus, selectSort, reverseSort, searchLibrary } = mediaSlice.actions;
 export default mediaSlice.reducer;

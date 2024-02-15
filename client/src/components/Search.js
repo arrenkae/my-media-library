@@ -1,7 +1,8 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect, useContext, memo } from "react";
-import { Paper, InputBase, Button, Alert, Typography, Stack } from '@mui/material';
+import { Paper, InputBase, Button, IconButton, Alert, Typography, Stack, Tooltip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import axios from "axios";
 import SearchData from "./SearchData"
 import { LibraryContext } from "./Library";
@@ -80,7 +81,11 @@ const Search = (props) => {
               e.preventDefault();
               handleSearch();
             }}>Search</Button>
-            <Button variant="text" onClick={handleClear}>Clear</Button>
+            <Tooltip title="Clear" placement="top">
+              <IconButton aria-label="clear-button" color='primary' size="small" onClick={handleClear}>
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Paper>
           {error ? <Alert variant="outlined" sx={{ maxWidth: 380 }} severity="error">{error}</Alert> : null}
       </Stack>

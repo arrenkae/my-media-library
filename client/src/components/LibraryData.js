@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect, useContext, memo } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { Grid, Box, Typography, ToggleButton, ToggleButtonGroup, Stack, Select, InputLabel, MenuItem, FormControl, LinearProgress, Switch, FormControlLabel } from '@mui/material';
+import { Grid, Box, Typography, ToggleButton, ToggleButtonGroup, Stack, Select, InputLabel, MenuItem, FormControl, LinearProgress, Switch, FormControlLabel, Paper, InputBase, Tooltip, IconButton } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 import LibraryCard from './LibraryCard';
-import { useGetMedia, useFilterStatus, useSelectSort, useReverseSort } from "../features/media/mediaHooks";
+import { useGetMedia, useFilterStatus, useSelectSort, useReverseSort, useSearchLibrary } from "../features/media/mediaHooks";
 import { LibraryContext } from "./Library";
 import { types } from './Library';
 import { statusNames } from './Library';
@@ -11,6 +13,7 @@ const LibraryData = (props) => {
     const { library } = useContext(LibraryContext);
     const fullLibrary = useSelector(state => state.media.library);
     const loadStatus = useSelector(state => state.media.load);
+    const search = useSelector(state => state.media.search);
 
     const type = useSelector(state => state.media.type);
     const status = useSelector(state => state.media.status);
@@ -19,6 +22,7 @@ const LibraryData = (props) => {
 
     const getMedia = useGetMedia();
     const filterStatus = useFilterStatus();
+    const searchLibrary = useSearchLibrary();
     const selectSort = useSelectSort();
     const reverseSort = useReverseSort();
 
@@ -37,11 +41,36 @@ const LibraryData = (props) => {
         }
     }
 
+    const handleSearch = (e) => {
+        searchLibrary(e.target.value);
+    }
+
+    const handleClear = () => {
+        searchLibrary('');
+    }
+
     const renderLibrary = 
         <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
             <Typography id="library-header" variant="h3" color="text.primary" gutterBottom>
                 My {types[type].typename}
             </Typography>
+            <Paper
+                component="form"
+                sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', maxWidth: { xs: '90%', sm: 400 }, }}
+                >
+                <SearchIcon sx={{ ml: 1 }} />
+                <InputBase
+                sx={{ ml: 1, flex: 1 }}
+                inputProps={{ 'aria-label': 'search new media' }}
+                value={search}
+                onChange={handleSearch}
+                />
+                <Tooltip title="Clear" placement="top">
+                    <IconButton aria-label="clear-button" color='primary' size="small" onClick={handleClear}>
+                        <ClearIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            </Paper>
             <Stack direction={{ sm: 'column', md: 'row' }} spacing={2} sx={{ maxWidth: '90%' }}>
                 <ToggleButtonGroup
                     color="primary"
@@ -61,11 +90,6 @@ const LibraryData = (props) => {
                     {
                         Object.keys(statusNames).map(status => <ToggleButton value={status}>{statusNames[status].replace('verb', types[type].verb)}</ToggleButton>)
                     }
-                    {/* <ToggleButton value="active">{types[type].verb + 'ing'}</ToggleButton>
-                    <ToggleButton value="backlog">{'Plan to ' + types[type].verb.toLowerCase()}</ToggleButton>
-                    <ToggleButton value="onhold">On-hold</ToggleButton>
-                    <ToggleButton value="completed">Completed</ToggleButton>
-                    <ToggleButton value="dropped">Dropped</ToggleButton> */}
                 </ToggleButtonGroup>
                 <FormControl sx={{ m: 1, minWidth: 120 }} >
                     <InputLabel id="sorting-select-label" >Sort by</InputLabel>
