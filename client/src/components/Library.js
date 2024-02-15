@@ -1,16 +1,16 @@
-import { useState, useRef, useEffect, createContext, useContext, memo } from 'react';
-import { useSelector, useDispatch } from "react-redux";
-import { Stack, Typography, Tabs, Tab, Box, Divider } from '@mui/material';
+import { useState, createContext, memo } from 'react';
+import { useSelector } from "react-redux";
+import { Stack, Tabs, Tab, Divider } from '@mui/material';
+import { useLibrarySelect, useFilterType } from "../features/media/mediaHooks";
 import LibraryData from './LibraryData';
 import Details from "./Details";
 import Search from './Search';
-import Logout from './Logout';
 import Notification from './Notification';
 import TopBar from './TopBar';
-import { useLibrarySelect, useFilterType } from "../features/media/mediaHooks";
 
 export const LibraryContext = createContext();
 
+/* types object is used as a template to fetch the same data from different APIs and then save it to a single database table */
 export const types = {
     tv: {
         typename: 'TV shows',
@@ -59,15 +59,17 @@ export const types = {
     }
   }
 
-  export const statusNames = {
+/* Display names for statuses, 'verb' is there to be replaced by an appropriate type verb */
+export const statusNames = {
     active: 'verbing',
     backlog: 'Plan to verb',
     onhold: 'On-hold',
     completed: 'Completed',
     dropped: 'Dropped'
-  }
+}
 
 const Library = (props) => {
+    /* Custom hook returns library with all the current filters applied */
     const library = useLibrarySelect();
     const type = useSelector(state => state.media.type);
     const [searchResults, setSearchResults] = useState([]);
@@ -77,6 +79,7 @@ const Library = (props) => {
 
     const selectType = useFilterType();
 
+    /* Functions to handle the modal component for Details, passed in the LibraryContext since it can be opened from several components */
     const handleOpenDetails = (id) => {
         setDetailsFetchId(id);
         setOpenDetails(true);

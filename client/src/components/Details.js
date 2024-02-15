@@ -1,14 +1,13 @@
 import { useEffect, useState, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Alert, CircularProgress, Tooltip } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
+import axios from "axios";
+import parse from 'html-react-parser';
+import _ from 'lodash';
+import { LibraryContext, types, statusNames } from "./Library";
 import { saveMedia } from "../features/media/mediaSlice";
 import { useGetMedia } from "../features/media/mediaHooks";
-import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Rating, Slider, Stack, Alert, CircularProgress, InputAdornment, OutlinedInput, FormHelperText, Tooltip } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-import { LibraryContext } from "./Library";
-import axios from "axios";
-import { types, statusNames } from "./Library";
-import _ from 'lodash';
-import parse from 'html-react-parser';
 import DetailsReleased from "./DetailsReleased";
 
 const style = {
@@ -39,9 +38,11 @@ const Details = (props) => {
     const dispatch = useDispatch();
     const getMedia = useGetMedia();
 
+    /* Even if the media is already in the library, fetches and updates the details in case it was updated in the original database */
     useEffect(()=>{
         fetchMedia()
         .then(data => {
+            /* Searches for existig media in the entire library instead of the possbly filtered version from LibraryContext */
             const existingMedia = fullLibrary.find(element => element.api_id == data.api_id && element.type == data.type);
             if (existingMedia) {
                 setMedia({...existingMedia, ...data});
@@ -61,13 +62,15 @@ const Details = (props) => {
             const response = await axios.get(types[type].mediaLink + detailsFetchId + '?' + types[type].api_key);
             if (response.status === 200) {
               return {
+                /* _get is used so that an object can access nested keys from a string variable */
                 api_id: response.data.id,
                 title: _.get(response.data, types[type].title),
                 author: type == 'book' ? response.data.volumeInfo.authors[0] : null,
                 type: type,
                 image: _.get(response.data, types[type].image) ? types[type].imageLink + _.get(response.data, types[type].image) : null,
                 description: _.get(response.data, types[type].description),
-                released: new Date(_.get(response.data, types[type].release_date)).getTime() < new Date().getTime(),
+                released: _.get(response.data, types[type].release_date) ? 
+                    new Date(_.get(response.data, types[type].release_date)).getTime() < new Date().getTime() : false,
                 progress_max: _.get(response.data, types[type].progress_max),
                 progress_seasons_max: type == 'tv' ? response.data.number_of_seasons : null,
                 release_date: _.get(response.data, types[type].release_date),
@@ -101,7 +104,8 @@ const Details = (props) => {
 
     const handleSelect = (e) => {
         setStatus(e.target.value);
-        if (e.target.value === 'Completed') {
+        /* If user selects 'completed' status, automatically sets progress to maximum, and restores it to current progress (if any) if the selection changes again */
+        if (e.target.value === 'completed') {
             setProgress(media.progress_max);
             if ( type === 'tv') {
                 setProgressSeasons(media.progress_seasons_max);
@@ -140,6 +144,7 @@ const Details = (props) => {
                     { media.update_date ? 'Last aired: ' + media.update_date : null }
                 </Typography>
                 <Typography sx={{ maxWidth: '70vw', maxHeight: { xs: '20vh', md: '40vh'}, overflowY: "scroll"}} id="modal-description" variant="body2" color="textPrimary" gutterBottom>
+                    {/* Uses html parser since descriptions from google books contain html tags */}
                     {media.description ? parse(`<p>${media.description}</p>`) : null}
                 </Typography>
                 <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
@@ -157,6 +162,7 @@ const Details = (props) => {
                         }
                     </Select>
                 </FormControl>
+                {/* Progress and rating are only available for the released titles */}
                 { media.released ?
                 <DetailsReleased
                     media={media}

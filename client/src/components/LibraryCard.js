@@ -1,14 +1,12 @@
-import { useState, useEffect, useContext, memo } from "react";
+import { useState, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteMedia, saveMedia } from "../features/media/mediaSlice";
-import { useGetMedia } from "../features/media/mediaHooks";
 import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Tooltip, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
+import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { LibraryContext } from "./Library";
-import { types } from "./Library";
-import { statusNames } from "./Library";
-import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
+import { deleteMedia } from "../features/media/mediaSlice";
+import { useGetMedia } from "../features/media/mediaHooks";
+import { LibraryContext, types, statusNames } from "./Library";
 
 const LibraryCard = ({media}) => {
     const { handleOpenDetails, setOpenNotification } = useContext(LibraryContext);
@@ -36,6 +34,7 @@ const LibraryCard = ({media}) => {
         }
     }
 
+    /* Functions for the delete confirmation dialog */
     const handleCloseConfirmation = () => {
         setOpenConfirmation(false);
     };
@@ -96,6 +95,7 @@ const LibraryCard = ({media}) => {
                 <Tooltip title="Edit" placement="top">
                     <IconButton
                         aria-label="edit"
+                        /* Opens the edit component */
                         onClick={() => handleOpenDetails(media.api_id)}
                     >
                         <EditIcon />
@@ -127,9 +127,7 @@ const LibraryCard = ({media}) => {
             </DialogTitle>
             <DialogActions>
                 <Button onClick={handleCloseConfirmation}>No</Button>
-                <Button onClick={handleAgree} autoFocus>
-                Yes
-                </Button>
+                <Button onClick={handleAgree} autoFocus>Yes</Button>
             </DialogActions>
             </Dialog>
         </>

@@ -1,10 +1,9 @@
 import { useEffect, useContext, memo } from 'react';
 import { useSelector } from "react-redux";
 import { Grid, Box, Typography, Stack, LinearProgress } from '@mui/material';
-import LibraryCard from './LibraryCard';
 import { useGetMedia } from "../features/media/mediaHooks";
-import { LibraryContext } from "./Library";
-import { types } from './Library';
+import { LibraryContext, types } from "./Library";
+import LibraryCard from './LibraryCard';
 import LibraryFilters from './LibraryFilters';
 
 const LibraryData = (props) => {
@@ -17,6 +16,7 @@ const LibraryData = (props) => {
     const getMedia = useGetMedia();
 
     useEffect(()=>{
+        /* Refreshes the library from the database based on the logged in user id */
         getMedia();
     }, []);
 
@@ -38,6 +38,7 @@ const LibraryData = (props) => {
             </Box>
             : 
             fullLibrary.length > 0 ?
+                /* Different message depending on whether the entire library is empty or just no results after filtering */
                 <Typography id="no-filter-results-header" variant="h5" color="textPrimary">
                     Nothing to see here!
                 </Typography> : 
