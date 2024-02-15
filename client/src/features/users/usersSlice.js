@@ -81,10 +81,6 @@ const usersSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    resetLoad: (state, action) => {
-      state.load = 'idle';
-      state.message = null;
-    },
     setMessage: (state, action) => {
       state.message = action.payload;
     },
@@ -134,5 +130,5 @@ const usersSlice = createSlice({
   },
 });
 
-export const { resetLoad, setMessage } = usersSlice.actions;
+export const { setMessage } = usersSlice.actions;
 export default usersSlice.reducer;

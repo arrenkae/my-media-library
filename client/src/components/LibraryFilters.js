@@ -1,8 +1,10 @@
 import { memo } from 'react';
 import { useSelector } from "react-redux";
-import { ToggleButton, ToggleButtonGroup, Stack, Select, InputLabel, MenuItem, FormControl, Switch, FormControlLabel, Paper, InputBase, Tooltip, IconButton } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup, Stack, Select, InputLabel, MenuItem, FormControl, Paper, InputBase, Tooltip, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useFilterStatus, useSelectSort, useReverseSort, useSearchLibrary } from "../features/media/mediaHooks";
 import { types, statusNames } from './Library';
 
@@ -59,7 +61,7 @@ const LibraryFilters = (props) => {
                     </IconButton>
                 </Tooltip>
             </Paper>
-            <Stack direction={{ sm: 'column', md: 'row' }} spacing={2} sx={{ maxWidth: '90%' }}>
+            <Stack direction={{ sm: 'column', md: 'row' }} spacing={2} sx={{ minWidth: { xs: '70%', sm: '50%' } }}>
                 {/* Toggle buttons to filter by status */}
                 <ToggleButtonGroup
                     color="primary"
@@ -82,29 +84,32 @@ const LibraryFilters = (props) => {
                     }
                 </ToggleButtonGroup>
                 {/* Selector for sorting type */}
-                <FormControl sx={{ m: 1, minWidth: 120 }} >
-                    <InputLabel id="sorting-select-label" >Sort by</InputLabel>
-                    <Select
-                        labelId="sorting-select-label"
-                        id="sorting-select"
-                        value={sort}
-                        label="Sort by"
-                        onChange={handleSort}
-                        >
-                        <MenuItem value='updated'>Updated</MenuItem>
-                        <MenuItem value='name'>Name</MenuItem>
-                        <MenuItem value='rating'>Rating</MenuItem>
-                        <MenuItem value='release'>Released</MenuItem>
-                    </Select>
-                </FormControl>
-                {/* Toggle between ascending and descending sort */}
-                <FormControlLabel control={
-                    <Switch
-                    checked={ascending}
-                    onChange={reverseSort}
-                    inputProps={{ 'aria-label': 'reverse-sorting' }}
-                    />
-                }label={ ascending ? 'Ascending' : 'Descending'} />
+                <Stack direction='row' spacing={2} >
+                    <FormControl sx={{ m: 1, minWidth: { xs: '85%', sm: 200, md: 120 } }} >
+                        <InputLabel id="sorting-select-label" >Sort by</InputLabel>
+                        <Select
+                            labelId="sorting-select-label"
+                            id="sorting-select"
+                            value={sort}
+                            label="Sort by"
+                            onChange={handleSort}
+                            >
+                            <MenuItem value='updated'>Updated</MenuItem>
+                            <MenuItem value='name'>Name</MenuItem>
+                            <MenuItem value='rating'>Rating</MenuItem>
+                            <MenuItem value='release'>Released</MenuItem>
+                        </Select>
+                    </FormControl>
+                    {/* Toggle between ascending and descending sort changing the icon on click */}
+                    <IconButton aria-label="sort-order-button" disableRipple='true' size='small' onClick={reverseSort} >
+                        <Tooltip title="Order" placement="top">
+                            { ascending ?
+                                <KeyboardArrowUpIcon sx={{"&:hover": { color: "#3f51b5" }}} /> :
+                                <KeyboardArrowDownIcon sx={{"&:hover": { color: "#3f51b5" }}} />
+                            }
+                        </Tooltip>
+                    </IconButton>
+                </Stack>
             </Stack>
         </>
     )

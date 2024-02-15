@@ -12,15 +12,22 @@ export const useLibrarySelect = () => {
             ( status != 'all' ? media.status == status : true )
         };
         switch (sort) {
-            /* Second 'toSorted' when ascending is true returns the normal sorted array */
             case 'updated':
-                return library.filter(filtering).toSorted((a, b) => new Date(a.user_update) - new Date(b.user_update))[ascending ? 'toSorted' : 'toReversed']();          
+                return library.filter(filtering)
+                .toSorted((a, b) => new Date(a.user_update) - new Date(b.user_update))
+                [ascending ? 'toSorted' : 'toReversed']();          
             case 'name':
-                return library.filter(filtering).toSorted((a, b) => a.title.localeCompare(b.title))[ascending ? 'toSorted' : 'toReversed']();
+                return library.filter(filtering)
+                .toSorted((a, b) => a.title.localeCompare(b.title))
+                [ascending ? 'toSorted' : 'toReversed']();
             case 'rating':
-                return library.filter(filtering).toSorted((a, b) => a.rating - b.rating)[ascending ? 'toSorted' : 'toReversed']();
+                return library.filter(filtering)
+                .toSorted((a, b) => a.rating - b.rating)
+                [ascending ? 'toSorted' : 'toReversed']();
             case 'release':
-                return library.filter(filtering).toSorted((a, b) => new Date(a.release_date) - new Date(b.release_date))[ascending ? 'toSorted' : 'toReversed']();
+                return library.filter(filtering)
+                .toSorted((a, b) => new Date(a.release_date) - new Date(b.release_date))
+                [ascending ? 'toSorted' : 'toReversed']();
         }
     });
     return useSelector(selectorLibrary);

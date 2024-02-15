@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, TextField, Button, Alert, CircularProgress, Typography } from '@mui/material';
-import { login, register, resetLoad, setMessage } from "../features/users/usersSlice";
+import { login, register, setMessage } from "../features/users/usersSlice";
 
 const LoginRegister = ({page}) => {
     const token = useSelector(state => state.users.token);
@@ -14,10 +14,6 @@ const LoginRegister = ({page}) => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    useEffect(()=>{
-        dispatch(resetLoad());
-    }, [])
 
     /* Reset alert and input fields when switching between login and register */
     useEffect(()=>{
@@ -91,14 +87,12 @@ const LoginRegister = ({page}) => {
                     Existing user? <Link to='/login'>Log in</Link>
                 </Typography>
             }
-            { loadStatus == 'loading' ? <CircularProgress sx={{mt:2}}/> : null }
+            { loadStatus === 'loading' ? <CircularProgress sx={{mt:2}}/> : null }
         </Box>
 
-    if (loadStatus == 'succeded' && token) {
+    if (loadStatus === 'succeded' && token) {
         navigate('/library');
-    }
-
-    return renderLoginRegister;
+    } else return renderLoginRegister;
 
 };
 
