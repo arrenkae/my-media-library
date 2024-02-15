@@ -10,7 +10,7 @@ const SearchData = (props) => {
     const renderSearch = 
         <>
             <Typography id="search-results-header" color="textPrimary" sx={{typography: { xs: 'h5', md: 'h4' }, textAlign: { xs: 'left', md: 'center' }, ml: { xs: 5, md: 0 }}}>
-                    Search results for: {searchResults.query}
+                Search results for: {searchResults.query}
             </Typography>
             <Box sx={{ m: 5 }}>
                 <Grid container spacing={3} >
