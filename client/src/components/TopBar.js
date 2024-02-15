@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { AppBar, Stack, Toolbar, Typography, Button, IconButton } from '@mui/material';
+import { AppBar, Stack, Toolbar, Typography, Button } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { logout } from "../features/users/usersSlice";
 
@@ -11,6 +11,7 @@ const TopBar = (props) => {
     const dispatch = useDispatch();
 
     const handleLogout = () => {
+        /* Token is cleared on logout */
         dispatch(logout())
         .then(() => navigate('/login'));
     }

@@ -90,6 +90,7 @@ const Library = (props) => {
         setOpenDetails(false);
     };
 
+    /* Media type is stored in the redux store, used to filter the displayed library and get pamareters for the API search */
     const handleChangeType = (event, newValue) => {
         selectType(newValue);
         setSearchResults([]);
@@ -111,6 +112,7 @@ const Library = (props) => {
             openNotification,
             setOpenNotification
             }}>
+            {/* Tabs to select the media type */}
             <Stack sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={type} onChange={handleChangeType} aria-label="type-select">
                     <Tab label="TV" value="tv" />
@@ -124,6 +126,7 @@ const Library = (props) => {
                 <LibraryData />
             </Stack>
             {detailsFetchId ? <Details /> : null}
+            {/* Notification snackbar is displayed only when its open state is toggled by a component */}
             <Notification message={'Library updated!'} />
         </LibraryContext.Provider>
         </>

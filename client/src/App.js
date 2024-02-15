@@ -1,14 +1,14 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState, createContext } from 'react';
 import { useSelector, useDispatch } from "react-redux";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { getToken } from "./features/users/usersSlice";
 import LoginRegister from './components/LoginRegister';
-import Logout from './components/Logout';
+import Library from './components/Library';
 import Auth from './auth/Auth';
 import './App.css';
-import Library from './components/Library';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 
+/* Customizing MUI theme; using self-hosted fonts */
 const theme = createTheme({
   palette: {
     primary: {
@@ -47,18 +47,19 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(()=>{
+    /* Tries to fetch token on refresh to keep the user logged in */
     if (!token) dispatch(getToken())
   }, [])
 
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
+        {/* App has only two pages; if the user is authorized, login redirects to library, and if not, library redirects to login */}
         <Routes>
           <Route path='/' element={ <Navigate to="/login" /> } />
           <Route path='/login' element={<LoginRegister page={'Login'}/>} />
           <Route path='/register' element={<LoginRegister page={'Register'}/>} />
           <Route path='/library' element={<Auth><Library/></Auth>} />
-          <Route path='/logout' element={<Logout />} />
         </Routes>
       </ThemeProvider>
     </div>

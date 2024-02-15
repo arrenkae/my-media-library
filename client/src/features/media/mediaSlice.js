@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {current } from '@reduxjs/toolkit'
 import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -70,6 +69,7 @@ const mediaSlice = createSlice({
       state.load = 'loading';
     });
     builder.addCase(saveMedia.fulfilled, (state, action) => {
+      /* Doesn't need to save to the state.library because Details component immediately updates the library after saving */
       state.load = 'succeded';
     });
     builder.addCase(saveMedia.rejected, (state, action) => {

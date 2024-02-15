@@ -1,13 +1,12 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useState, useEffect, useContext, memo } from "react";
 import { Paper, InputBase, Button, IconButton, Alert, Typography, Stack, Tooltip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import axios from "axios";
-import SearchData from "./SearchData"
-import { LibraryContext } from "./Library";
-import { types } from "./Library";
 import _ from 'lodash';
+import SearchData from "./SearchData"
+import { LibraryContext, types } from "./Library";
 
 const Search = (props) => {
   const type = useSelector(state => state.media.type);
@@ -46,8 +45,10 @@ const Search = (props) => {
     setSearchResults([]);
     setError();
     try {
+        /* Constructs an API link depending on the media type using the template object */
         const response = await axios.get(types[type].searchLink + query + '&' + types[type].api_key);
         if (response.status === 200) {
+          /* Query is saved in the results so that it can be displayed in the SearchData title */
           setSearchResults({query, results: response.data[types[type].searchResults]});
           if (response.data[types[type].searchResults].length === 0) {
             showError('No media found');
@@ -66,6 +67,7 @@ const Search = (props) => {
           <Typography id="search-header" variant="h6" color="textSecondary">
               Search for new {types[type].typename}
           </Typography>
+          {/* Search field */}
           <Paper
             component="form"
             sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', maxWidth: { xs: '90%', sm: 400 }, }}
@@ -81,6 +83,7 @@ const Search = (props) => {
               e.preventDefault();
               handleSearch();
             }}>Search</Button>
+            {/* Clear button both resets the search fields and hides the search results */}
             <Tooltip title="Clear" placement="top">
               <IconButton aria-label="clear-button" color='primary' size="small" onClick={handleClear}>
                 <ClearIcon fontSize="small" />

@@ -1,17 +1,16 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { login, register, resetLoad, setMessage } from "../features/users/usersSlice";
 import { Box, TextField, Button, Alert, CircularProgress, Typography } from '@mui/material';
+import { login, register, resetLoad, setMessage } from "../features/users/usersSlice";
 
 const LoginRegister = ({page}) => {
     const token = useSelector(state => state.users.token);
+    const loadStatus = useSelector(state => state.users.load);
+    const message = useSelector(state => state.users.message);
     const [alert, setAlert] = useState(false);
     const usernameRef = useRef(null);
     const passwordRef = useRef(null);
-    const loadStatus = useSelector(state => state.users.load);
-    const message = useSelector(state => state.users.message);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -20,6 +19,7 @@ const LoginRegister = ({page}) => {
         dispatch(resetLoad());
     }, [])
 
+    /* Reset alert and input fields when switching between login and register */
     useEffect(()=>{
         if (usernameRef.current?.value) usernameRef.current.value = '';
         if (passwordRef.current?.value) passwordRef.current.value = '';
@@ -28,6 +28,7 @@ const LoginRegister = ({page}) => {
 
     const loginregister = async() => {
         if (usernameRef.current.value && passwordRef.current.value) {
+            /* If login is successfull, redirects to library; in other cases, notifies about the result */
             if (page === 'Login') {
                 dispatch(login({username: usernameRef.current.value, password: passwordRef.current.value}))
                 .then(() => showAlert());

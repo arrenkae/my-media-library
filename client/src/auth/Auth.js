@@ -1,7 +1,7 @@
-import { Navigate } from 'react-router-dom';
 import { useEffect } from "react";
-import { CircularProgress } from '@mui/material';
 import { useSelector, useDispatch } from "react-redux";
+import { Navigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
 import { verify } from "../features/users/usersSlice";
 
 const Auth = (props) => {
@@ -14,6 +14,7 @@ const Auth = (props) => {
         dispatch(verify(token));
     }, [])
 
+    /* Wraps the Library component, preventing unauthorized users from accessing it and redirecting them to login */
     return token ? props.children : loadStatus == 'failed' ? <Navigate to="/login" /> : <CircularProgress />;
 }
 

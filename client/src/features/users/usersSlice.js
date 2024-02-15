@@ -93,6 +93,7 @@ const usersSlice = createSlice({
     builder.addCase(getToken.fulfilled, (state, action) => {
       state.load = 'succeded';
       state.token = action.payload.token;
+      /* User information is decoded from the token */
       const decode = jwtDecode(action.payload.token);
       state.user = decode.user;
     });

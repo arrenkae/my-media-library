@@ -39,6 +39,7 @@ const LibraryCard = ({media}) => {
         setOpenConfirmation(false);
     };
 
+    /* If user agrees to delete the media, updates the library */
     const handleAgree = () => {
         dispatch(deleteMedia(idToDelete))
         .then(() => {
@@ -62,10 +63,12 @@ const LibraryCard = ({media}) => {
                         image={types[type].imageLink + media.image}
                         title={media.title + ' poster'}
                     /> :
+                    /* Displays an icon for media with no images */
                     <Box sx={{ width: 200, height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <ImageNotSupportedIcon fontSize="large" />
                     </Box>
                 }
+                {/* Status chip is customized with different color for different statuses and different display names based on the media */}
                 <Chip label={statusNames[media.status].replace('verb', types[type].verb)} sx={{ mt: 2, mb: 2, width: '80%' }} color={chipColor()} />
                 <Typography id="card-title" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
                     {media.title}
@@ -78,6 +81,7 @@ const LibraryCard = ({media}) => {
                     : null
                 }
             </Box>
+            {/* Progress (with seasons for tv shows) */}
             <CardContent >
                 <Typography variant="body2" color="text.secondary">
                     {media.progress} / {media.progress_max} {types[type].progress}
@@ -89,6 +93,7 @@ const LibraryCard = ({media}) => {
                     </Typography>
                     :null
                 }
+                {/* Rating (if any) */}
                 { media.rating != 0 ? <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly /> : null }
             </CardContent >
             <CardActions sx={{ display: 'flex', justifyContent:'flex-end' }}>

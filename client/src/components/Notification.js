@@ -1,10 +1,11 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { LibraryContext } from "./Library";
 
 const Notification = ({message}) => {
+    /* Can be opened by different components, so the open state and function are passed from the LibraryContext */
     const { openNotification, setOpenNotification } = useContext(LibraryContext);
 
     const handleClose = (event, reason) => {

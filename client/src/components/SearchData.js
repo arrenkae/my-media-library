@@ -1,8 +1,7 @@
-import { useState, useEffect, useContext, memo } from "react";
-import { useSelector } from "react-redux";
-import { Grid, Box, Typography, CircularProgress, Stack } from '@mui/material';
-import SearchCard from "./SearchCard";
+import { useContext, memo } from "react";
+import { Grid, Box, Typography } from '@mui/material';
 import { LibraryContext } from "./Library";
+import SearchCard from "./SearchCard";
 
 const SearchData = (props) => {
     const { searchResults } = useContext(LibraryContext);

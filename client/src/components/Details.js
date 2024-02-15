@@ -54,11 +54,13 @@ const Details = (props) => {
                 setMedia(data);
             };
         })
+        /* Need to figure out where to display this error */
         .catch(err => console.log(err))
     }, [])
 
     const fetchMedia = async() => {
         try {
+            /* Constructs an API link depending on the media type using the template object */
             const response = await axios.get(types[type].mediaLink + detailsFetchId + '?' + types[type].api_key);
             if (response.status === 200) {
               return {
@@ -157,6 +159,7 @@ const Details = (props) => {
                         onChange={handleSelect}
                         >
                         { media.released ? 
+                            /* Returns status display names changing them according to type (active => watching/reading) */
                             Object.keys(statusNames).map(status => <MenuItem value={status}>{statusNames[status].replace('verb', types[type].verb)}</MenuItem>)
                             : <MenuItem value='backlog'>{statusNames.backlog.replace('verb', types[type].verb)}</MenuItem>
                         }

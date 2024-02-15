@@ -1,16 +1,18 @@
-import { createSelector } from "@reduxjs/toolkit";
-import { useSelector, useDispatch } from "react-redux";
 import { useCallback } from 'react';
-import { library, type, filterType, status, sort, filterStatus, selectSort, getMedia, reverseSort, ascending, searchLibrary, search } from './mediaSlice';
+import { useSelector, useDispatch } from "react-redux";
+import { createSelector } from "@reduxjs/toolkit";
+import { library, getMedia, type, filterType, status, filterStatus, search, searchLibrary, sort, selectSort, ascending, reverseSort } from './mediaSlice';
 
 export const useLibrarySelect = () => {
     const selectorLibrary = createSelector([library, type, status, search, sort, ascending], (library, type, status, search, sort, ascending) => {
+        /* Creates a single filtering function based on different filter parameters */
         const filtering = (media) => {
             return media.type == type && 
             ( search ? media.title.toLowerCase().includes(search.toLowerCase()) : true ) &&
             ( status != 'all' ? media.status == status : true )
         };
         switch (sort) {
+            /* Second 'toSorted' when ascending is true returns the normal sorted array */
             case 'updated':
                 return library.filter(filtering).toSorted((a, b) => new Date(a.user_update) - new Date(b.user_update))[ascending ? 'toSorted' : 'toReversed']();          
             case 'name':

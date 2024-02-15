@@ -9,16 +9,12 @@ users_router.post('/login', login);
 users_router.put('/update', verifytoken, updateUser);
 users_router.delete('/delete', verifytoken, deleteUser);
 
-
-users_router.get('/profile', verifytoken, (req, res) => {
-    res.json({ msg: `Welcome, ${req.user.username}!` });
-});
-
 users_router.get('/verify', verifytoken, (req, res) => {
     res.sendStatus(200);
 });
 
 users_router.get('/token', (req, res) => {
+    /* Used to get token on the page refresh to keep the user logged in */
     const token = req.cookies.token || req.headers['x-access-token'];
     if (token) {
         res.status(200).json({token});

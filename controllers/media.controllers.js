@@ -1,6 +1,7 @@
 import { _getUserMedia, _saveMedia, _deleteMedia } from "../models/media.models.js";
 
 export const getUserMedia = async(req, res) => {
+    /* User id is received from the veryfytoken middleware after decoding the token */
     const user_id = req.user.id;
     try {
         const rows = await _getUserMedia(user_id);
@@ -21,20 +22,6 @@ export const saveMedia = async(req, res) => {
     } catch (error) {
         console.log('saveMedia=>', error);
         res.status(404).json({msg: 'Unable to save media'});
-    }
-}
-
-export const updateMedia = async(req, res) => {
-    const {id} = req.params;
-    const user_id = req.user.id;
-    const media = req.body;
-
-    try {
-        const row = await _updateMedia(id, {...media, user_id});
-        res.status(201).json(row);
-    } catch (error) {
-        console.log('updateMedia=>', error);
-        res.status(404).json({msg: 'Unable to update media'});
     }
 }
 

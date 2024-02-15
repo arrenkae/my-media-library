@@ -7,6 +7,7 @@ dotenv.config();
 export const register = async(req, res) => {
     const { username, password } = req.body;
 
+    /* Encrypting the password for the database */
     const salt = bcrypt.genSaltSync(10);
     const hashedpwd = bcrypt.hashSync(password + "", salt);
 
