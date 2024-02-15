@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, memo } from "react";
+import { useEffect, useState, useRef, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Alert, CircularProgress, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
@@ -33,6 +33,7 @@ const Details = (props) => {
     const [progress_seasons, setProgressSeasons] = useState(0);
     const [rating, setRating] = useState(0);
     const [error, setError] = useState();
+    const prevProgressRef = useRef();
     const loadStatus = useSelector(state => state.media.load);
     
     const dispatch = useDispatch();
@@ -57,6 +58,16 @@ const Details = (props) => {
         /* Need to figure out where to display this error */
         .catch(err => console.log(err))
     }, [])
+
+    /* Ref used to store previous progress value so that it doesn't get reset after switching back from completed and backlog statuses */
+    useEffect(() => {
+        /* For existing media, resets to the value from the database insead of the last input */
+        if (media?.progress) {
+            prevProgressRef.current = media.progress;
+        } else if (( progress != 0 ) && ( progress != media?.progress_max )) {
+            prevProgressRef.current = progress;
+        }
+    }, [progress])
 
     const fetchMedia = async() => {
         try {
@@ -106,20 +117,24 @@ const Details = (props) => {
 
     const handleSelect = (e) => {
         setStatus(e.target.value);
-        /* If user selects 'completed' status, automatically sets progress to maximum, and restores it to current progress (if any) if the selection changes again */
+        /* Progress is automatically set to max when selecting 'completed' and to 0 when selecting 'plan to watch/read' */
         if (e.target.value === 'completed') {
             setProgress(media.progress_max);
             if ( type === 'tv') {
                 setProgressSeasons(media.progress_seasons_max);
             }
+        } else if (e.target.value === 'backlog') {
+            setProgress(0);
+            if ( type === 'tv') {
+                setProgressSeasons(0);
+            }
         } else {
-            setProgress(media.progress ? media.progress : 0);
+            setProgress(prevProgressRef.current);
             if ( type === 'tv') {
                 setProgressSeasons(media.progress_seasons ? media.progress_seasons : 0);
             }
         }
     };
-    
     
     return (
         media ? 
@@ -175,6 +190,7 @@ const Details = (props) => {
                     setProgressSeasons={setProgressSeasons}
                     rating={rating}
                     setRating={setRating}
+                    setStatus={setStatus}
                 /> : null }
                 {error ? <Alert sx={{ mt: 2, maxWidth: 400 }} severity="error">{error}</Alert> : null}
                 <Tooltip title="Save" placement="top">

@@ -11,10 +11,6 @@ const DetailsReleased = ({media, progress, setProgress, progress_seasons, setPro
         setProgress(e.target.value === '' ? 0 : Number(e.target.value));
     }
 
-    const handleSliderChange = (e) => {
-        setProgress(e.target.value);
-    }
-
     const handleSeasonChange = (e) => {
         setProgressSeasons(e.target.value === '' ? 0 : Number(e.target.value));
     }
@@ -36,7 +32,7 @@ const DetailsReleased = ({media, progress, setProgress, progress_seasons, setPro
             {/* Slider and the number input form display the same value and if one changes the other changes as well */}
             <Slider
                 value={progress}
-                onChange={handleSliderChange}
+                onChange={handleProgressChange}
                 max={media.progress_max}
                 valueLabelDisplay="auto"
                 aria-labelledby="input-slider"
