@@ -13,7 +13,7 @@ import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 const LibraryCard = ({media}) => {
     const { handleOpenDetails, setOpenNotification } = useContext(LibraryContext);
     const [ openConfirmation, setOpenConfirmation ] = useState(false);
-    const [idToDelete, setIdToDelete] = useState();
+    const [ idToDelete, setIdToDelete ] = useState();
     const type = useSelector(state => state.media.type);
     const dispatch = useDispatch();
 
