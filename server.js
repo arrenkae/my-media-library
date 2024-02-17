@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import users_router from "./routes/users.routes.js";
 import media_router from "./routes/media.routes.js";
 import search_router from "./routes/search.routes.js";
+import details_router from "./routes/details.routes.js";
 import cookieParser from "cookie-parser";
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.listen(process.env.PORT || 3001, () => {
 app.use('/users', users_router);
 app.use('/media', media_router);
 app.use('/search', search_router);
+app.use('/details', details_router);
 
 app.use(express.static(path.join(__dirname, "/client/build")));
 

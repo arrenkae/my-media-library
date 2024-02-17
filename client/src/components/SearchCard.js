@@ -29,6 +29,13 @@ const SearchCard = ({media}) => {
                 <Typography id="card-title" variant="h6" gutterBottom>
                         {media.title}
                 </Typography>
+            {   
+                media.author ?
+                <Typography id="book-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
+                    {media.author}
+                </Typography>
+                : null
+            }
             </CardContent >
             <CardContent sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Tooltip title="Add" placement="top">

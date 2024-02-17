@@ -73,8 +73,8 @@ const LibraryCard = ({media}) => {
                     {media.title}
                 </Typography>
                 {   
-                    type === 'book' ?
-                    <Typography id="book-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
+                    media.author ?
+                    <Typography id="card-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
                         {media.author}
                     </Typography>
                     : null

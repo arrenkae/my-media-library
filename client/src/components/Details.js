@@ -54,9 +54,8 @@ const Details = (props) => {
     }, [progress])
 
     const fetchMedia = async() => {
-        console.log(`${BASE_URL}/search/${type}/details/${detailsFetchId}`);
         try {
-            const response = await axios.get(`${BASE_URL}/search/${type}/details/${detailsFetchId}`);
+            const response = await axios.get(`${BASE_URL}/details/${type}/${detailsFetchId}`);
             if (response.status === 200) {
                 const existingMedia = fullLibrary.find(element => element.api_id == detailsFetchId && element.type == type);
                 if (existingMedia) {
@@ -159,7 +158,7 @@ const Details = (props) => {
                         >
                         { media.released ? 
                             /* Returns status display names changing them according to type (active => watching/reading) */
-                            Object.keys(statusNames).map(status => <MenuItem value={status}>{statusNames[status].replace('verb', types[type].verb)}</MenuItem>)
+                            Object.keys(statusNames).map(status => <MenuItem key={status} value={status}>{statusNames[status].replace('verb', types[type].verb)}</MenuItem>)
                             : <MenuItem value='backlog'>{statusNames.backlog.replace('verb', types[type].verb)}</MenuItem>
                         }
                     </Select>
