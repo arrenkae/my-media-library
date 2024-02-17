@@ -9,7 +9,7 @@ import { useGetMedia } from "../features/media/mediaHooks";
 import { LibraryContext, types, statusNames } from "./Library";
 
 const LibraryCard = ({media}) => {
-    const { handleOpenDetails, setOpenNotification } = useContext(LibraryContext);
+    const { handleOpenDetails, showNotification } = useContext(LibraryContext);
     const [ openConfirmation, setOpenConfirmation ] = useState(false);
     const [ idToDelete, setIdToDelete ] = useState();
     const type = useSelector(state => state.media.type);
@@ -44,7 +44,6 @@ const LibraryCard = ({media}) => {
         dispatch(deleteMedia(idToDelete))
         .then(() => {
             getMedia();
-            setOpenNotification(true);
         })
         setOpenConfirmation(false);
     };
@@ -60,8 +59,8 @@ const LibraryCard = ({media}) => {
                 { media.image ?
                     <CardMedia
                         sx={{ width: 200, height: 300 }}
-                        image={types[type].imageLink + media.image}
-                        title={media.title + ' poster'}
+                        image={media.image}
+                        title={media.title + ' image'}
                     /> :
                     /* Displays an icon for media with no images */
                     <Box sx={{ width: 200, height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

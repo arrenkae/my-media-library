@@ -1,10 +1,8 @@
 import { useContext } from "react";
-import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
+import { Snackbar, Alert } from '@mui/material';
 import { LibraryContext } from "./Library";
 
-const Notification = ({message}) => {
+const Notification = ({message, severity}) => {
     /* Can be opened by different components, so the open state and function are passed from the LibraryContext */
     const { openNotification, setOpenNotification } = useContext(LibraryContext);
 
@@ -15,31 +13,37 @@ const Notification = ({message}) => {
     setOpenNotification(false);
     };
 
-    const action = (
-    <>
-        <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleClose}
-        >
-        <CloseIcon fontSize="small" />
-        </IconButton>
-    </>
-    );
+    // const action = (
+    // <>
+    //     <IconButton
+    //     size="small"
+    //     aria-label="close"
+    //     color="inherit"
+    //     onClick={handleClose}
+    //     >
+    //     <CloseIcon fontSize="small" />
+    //     </IconButton>
+    // </>
+    // );
 
     return (
         <Snackbar
-        anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right'
-        }}
-        open={openNotification}
-        autoHideDuration={5000}
-        onClose={handleClose}
-        message={message}
-        action={action}
-        />
+            anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right'
+            }}
+            open={openNotification}
+            autoHideDuration={5000}
+            onClose={handleClose}>
+            <Alert
+                onClose={handleClose}
+                severity={severity}
+                variant="filled"
+                sx={{ width: '100%' }}
+                >
+                {message}
+            </Alert>
+        </Snackbar>
     );
 }
 
