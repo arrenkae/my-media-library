@@ -1,14 +1,15 @@
 import { useEffect, useState, useRef, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Alert, CircularProgress, Tooltip } from '@mui/material';
+import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, CircularProgress, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import axios from "axios";
 import parse from 'html-react-parser';
-import _ from 'lodash';
 import { LibraryContext, types, statusNames } from "./Library";
-import { saveMedia } from "../features/media/mediaSlice";
+import { saveMedia, setMessage } from "../features/media/mediaSlice";
 import { useGetMedia } from "../features/media/mediaHooks";
 import DetailsReleased from "./DetailsReleased";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const style = {
     position: { xs: 'fixed', sm: 'absolute'},
@@ -24,7 +25,7 @@ const style = {
 };
 
 const Details = (props) => {
-    const { detailsFetchId, openDetails, handleCloseDetails, setSearchResults, setOpenNotification } = useContext(LibraryContext);
+    const { detailsFetchId, openDetails, handleCloseDetails, setSearchResults, showNotification } = useContext(LibraryContext);
     const fullLibrary = useSelector(state => state.media.library);
     const type = useSelector(state => state.media.type);
     const [media, setMedia] = useState();
@@ -32,31 +33,14 @@ const Details = (props) => {
     const [progress, setProgress] = useState(0);
     const [progress_seasons, setProgressSeasons] = useState(0);
     const [rating, setRating] = useState(0);
-    const [error, setError] = useState();
     const prevProgressRef = useRef();
-    const loadStatus = useSelector(state => state.media.load);
     
     const dispatch = useDispatch();
     const getMedia = useGetMedia();
 
-    /* Even if the media is already in the library, fetches and updates the details in case it was updated in the original database */
     useEffect(()=>{
-        fetchMedia()
-        .then(data => {
-            /* Searches for existig media in the entire library instead of the possbly filtered version from LibraryContext */
-            const existingMedia = fullLibrary.find(element => element.api_id == data.api_id && element.type == data.type);
-            if (existingMedia) {
-                setMedia({...existingMedia, ...data});
-                setStatus(existingMedia.status);
-                setProgress(existingMedia.progress);
-                setRating(existingMedia.rating)
-                setProgressSeasons(existingMedia.progress_seasons);
-            } else {
-                setMedia(data);
-            };
-        })
-        /* Need to figure out where to display this error */
-        .catch(err => console.log(err))
+        dispatch(setMessage());
+        fetchMedia();
     }, [])
 
     /* Ref used to store previous progress value so that it doesn't get reset after switching back from completed and backlog statuses */
@@ -71,27 +55,23 @@ const Details = (props) => {
 
     const fetchMedia = async() => {
         try {
-            /* Constructs an API link depending on the media type using the template object */
-            const response = await axios.get(types[type].mediaLink + detailsFetchId + '?' + types[type].api_key);
+            const response = await axios.get(`${BASE_URL}/details/${type}/${detailsFetchId}`);
             if (response.status === 200) {
-              return {
-                /* _get is used so that an object can access nested keys from a string variable */
-                api_id: response.data.id,
-                title: _.get(response.data, types[type].title),
-                author: type == 'book' ? response.data.volumeInfo.authors[0] : null,
-                type: type,
-                image: _.get(response.data, types[type].image) ? types[type].imageLink + _.get(response.data, types[type].image) : null,
-                description: _.get(response.data, types[type].description),
-                released: _.get(response.data, types[type].release_date) ? 
-                    new Date(_.get(response.data, types[type].release_date)).getTime() < new Date().getTime() : false,
-                progress_max: _.get(response.data, types[type].progress_max),
-                progress_seasons_max: type == 'tv' ? response.data.number_of_seasons : null,
-                release_date: _.get(response.data, types[type].release_date),
-                update_date: type == 'tv' ? response.data.last_air_date : null
-              };
-            };
+                const existingMedia = fullLibrary.find(element => element.api_id == detailsFetchId && element.type == type);
+                if (existingMedia) {
+                    setMedia({...existingMedia, ...response.data.media});
+                    setStatus(existingMedia.status);
+                    setProgress(existingMedia.progress);
+                    setRating(existingMedia.rating)
+                    setProgressSeasons(existingMedia.progress_seasons);
+                } else {
+                    setMedia(response.data.media);
+                };
+            } else {
+                showNotification(response.data.msg, 'error');
+            }
         } catch (error) {
-            setError('Unable to fetch media details');
+            showNotification('Unable to get media data', 'error');
         }
     };
 
@@ -103,16 +83,11 @@ const Details = (props) => {
             progress_seasons: type === 'tv' ? progress_seasons : null
 
         }))
-        .then(() => getMedia())
         .then(() => {
-            if (loadStatus == 'failed') {
-                setError('Unable to save')
-            } else {
-                handleCloseDetails();
-                setSearchResults([]);
-                setOpenNotification(true);
-            }
+            handleCloseDetails();
+            setSearchResults([]);
         })
+        .then(() => getMedia())
     }
 
     const handleSelect = (e) => {
@@ -157,6 +132,14 @@ const Details = (props) => {
                 <Typography id="release-date" variant="h6" color="textPrimary" gutterBottom>
                     { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'Not yet released' }
                 </Typography>
+                {/* Shows the release date as 'planned release date' if it's in the future */}
+                {
+                    (!media.released && media.release_date) ?
+                    <Typography id="planned-release-date" variant="h6" color="textPrimary" gutterBottom>
+                        Planned release date: {media.release_date}
+                    </Typography>
+                    : null
+                }
                 <Typography id="latest-release-date" variant="h6" color="textPrimary" gutterBottom>
                     { media.update_date ? 'Last aired: ' + media.update_date : null }
                 </Typography>
@@ -175,7 +158,7 @@ const Details = (props) => {
                         >
                         { media.released ? 
                             /* Returns status display names changing them according to type (active => watching/reading) */
-                            Object.keys(statusNames).map(status => <MenuItem value={status}>{statusNames[status].replace('verb', types[type].verb)}</MenuItem>)
+                            Object.keys(statusNames).map(status => <MenuItem key={status} value={status}>{statusNames[status].replace('verb', types[type].verb)}</MenuItem>)
                             : <MenuItem value='backlog'>{statusNames.backlog.replace('verb', types[type].verb)}</MenuItem>
                         }
                     </Select>
@@ -192,7 +175,6 @@ const Details = (props) => {
                     setRating={setRating}
                     setStatus={setStatus}
                 /> : null }
-                {error ? <Alert sx={{ mt: 2, maxWidth: 400 }} severity="error">{error}</Alert> : null}
                 <Tooltip title="Save" placement="top">
                     <Fab color="secondary" aria-label="save" onClick={save} sx={{ position: 'absolute', bottom: 40, right: 40 }}>
                         <SaveIcon />
@@ -200,7 +182,7 @@ const Details = (props) => {
                 </Tooltip>
             </Box>
         </Modal>
-        : <CircularProgress />
+        : null
     )
 };
 

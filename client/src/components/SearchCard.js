@@ -3,8 +3,7 @@ import { useSelector } from "react-redux";
 import { Card, Box, CardContent, CardMedia, Fab, Typography, Tooltip } from '@mui/material';
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import AddIcon from '@mui/icons-material/Add';
-import _ from 'lodash';
-import { LibraryContext, types } from "./Library";
+import { LibraryContext } from "./Library";
 import LibraryCard from "./LibraryCard";
 
 const SearchCard = ({media}) => {
@@ -12,15 +11,14 @@ const SearchCard = ({media}) => {
     const type = useSelector(state => state.media.type);
     /* Checks if the media is already in the library and if so displays the library card instead; it can then be updated */
     const existingMedia = library.find(element => element.api_id == media.id && element.type == type);
-    
+
     const renderLibraryCard = 
         <Card sx={{ maxWidth: 200, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
-            {/* _get is used so that an object can access nested keys from a string variable */}
-            { _.get(media, types[type].image) ?
+            {media.image ?
                 <CardMedia
                     sx={{ width: 200, height: 300 }}
-                    image={types[type].imageLink + _.get(media, types[type].image)}
-                    title={_.get(media, types[type].title) + ' image'}
+                    image={media.image}
+                    title={media.title + ' image'}
                 /> :
                 /* Displays an icon for media with no images */
                 <Box sx={{ width: 200, height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -29,12 +27,19 @@ const SearchCard = ({media}) => {
             }
             <CardContent>
                 <Typography id="card-title" variant="h6" gutterBottom>
-                        {_.get(media, types[type].title)}
+                        {media.title}
                 </Typography>
+            {   
+                media.author ?
+                <Typography id="book-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
+                    {media.author}
+                </Typography>
+                : null
+            }
             </CardContent >
             <CardContent sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Tooltip title="Add" placement="top">
-                    <Fab size="small" color="secondary" aria-label="add" onClick={() => handleOpenDetails(media.id)}>
+                    <Fab size="small" color="secondary" aria-label="add" onClick={() => handleOpenDetails(media.api_id)}>
                         <AddIcon />
                     </Fab>
                 </ Tooltip>

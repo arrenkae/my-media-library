@@ -4,9 +4,10 @@ import { Paper, InputBase, Button, IconButton, Alert, Typography, Stack, Tooltip
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import axios from "axios";
-import _ from 'lodash';
 import SearchData from "./SearchData"
 import { LibraryContext, types } from "./Library";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Search = (props) => {
   const type = useSelector(state => state.media.type);
@@ -46,18 +47,14 @@ const Search = (props) => {
     setError();
     try {
         /* Constructs an API link depending on the media type using the template object */
-        const response = await axios.get(types[type].searchLink + query + '&' + types[type].api_key);
+        const response = await axios.get(`${BASE_URL}/search/${type}/${query}`);
         if (response.status === 200) {
           /* Query is saved in the results so that it can be displayed in the SearchData title */
-          setSearchResults({query, results: response.data[types[type].searchResults]});
-          if (response.data[types[type].searchResults].length === 0) {
-            showError('No media found');
-          } else {
-            setQuery('');
-          }
-        };
+          setSearchResults({query, results: response.data.results});
+          setQuery('');
+        }
     } catch (error) {
-        showError('Search error');
+      setError(error.response.data.msg ? error.response.data.msg : error.message);
     }
   };
 
