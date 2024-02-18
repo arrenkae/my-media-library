@@ -7,6 +7,8 @@ export const getTVDetails = async(req, res) => {
     const {id} = req.params;
     try {
         const APIresponse = await axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.TV_MOVIES_API_KEY}`);
+        const media_seasons = APIresponse.data.seasons.filter(season => season.name.startsWith('Season') && season.air_date && new Date(season.air_date).getTime() < new Date().getTime());
+        console.log(media_seasons);
         const media = {
             api_id: APIresponse.data.id,
             type: 'tv',
@@ -16,8 +18,19 @@ export const getTVDetails = async(req, res) => {
             release_date: APIresponse.data.first_air_date,
             released: APIresponse.data.first_air_date ? new Date(APIresponse.data.first_air_date).getTime() < new Date().getTime() : false,
             update_date: APIresponse.data.last_air_date,
-            progress_max: APIresponse.data.number_of_episodes,
-            progress_seasons_max: APIresponse.data.number_of_seasons
+            progress_max: media_seasons.length > 0 ?
+                media_seasons.reduce((total, season) => {
+                    return total + season.episode_count;
+                }, 0)
+                : APIresponse.data.number_of_episodes,
+            seasons: media_seasons.length > 1 ?
+                media_seasons.map((season, index) => [
+                    index+1,
+                    media_seasons.slice(0, index+1).reduce((total, season) => {
+                        return total + season.episode_count;
+                    }, 0)
+                ])
+                : null
         }
         res.status(200).json({media});
     } catch (error) {

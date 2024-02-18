@@ -31,11 +31,10 @@ const Details = (props) => {
     const [media, setMedia] = useState();
     const [status, setStatus] = useState('backlog');
     const [progress, setProgress] = useState(0);
-    const [progress_seasons, setProgressSeasons] = useState(0);
+    const [progressSeasons, setProgressSeasons] = useState(0);
     const [rating, setRating] = useState(0);
     const [tempStatus, setTempStatus] = useState();
     const [tempProgress, setTempProgress] = useState();
-    const [tempSeasons, setTempSeasons] = useState();
     
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -49,7 +48,6 @@ const Details = (props) => {
     useEffect(()=>{
         if (media?.status) setTempStatus((media.status != 'completed') && (media.status != 'backlog') ? media.status : 'active');
         if (media?.progress) setTempProgress(media.progress);
-        if (media?.progress_seasons) setTempSeasons(media.progress_seasons);
     }, [media])
 
     const fetchMedia = async() => {
@@ -61,8 +59,10 @@ const Details = (props) => {
                     setMedia({...existingMedia, ...response.data.media});
                     setStatus(existingMedia.status);
                     setProgress(existingMedia.progress);
-                    setRating(existingMedia.rating)
-                    setProgressSeasons(existingMedia.progress_seasons);
+                    setRating(existingMedia.rating);
+                    if (existingMedia.seasons) {
+                        setProgressSeasons(existingMedia.seasons.findLast(season => season[1] <= existingMedia.progress)[0] || 0)
+                    }
                 } else {
                     setMedia(response.data.media);
                 };
@@ -78,9 +78,7 @@ const Details = (props) => {
         dispatch(saveMedia({...media,
             status,
             progress,
-            rating,
-            progress_seasons: type === 'tv' ? progress_seasons : null
-
+            rating
         }))
         .then(() => {
             handleCloseDetails();
@@ -93,50 +91,48 @@ const Details = (props) => {
         setStatus(e.target.value);
         if (e.target.value === 'completed') {
             setProgress(media?.progress_max);
-            if ( media?.progress_seasons_max) {
-                setProgressSeasons(media?.progress_seasons_max);
+            if (media?.seasons) {
+                setProgressSeasons(media?.seasons.length);
             }
         } else if (e.target.value === 'backlog') {
             setProgress(0);
-            if ( type === 'tv') {
+            if (media?.seasons) {
                 setProgressSeasons(0);
             }
         } else {
             setProgress(tempProgress);
-            if ( type === 'tv' ) {
-                setProgressSeasons(media?.progress_seasons || tempSeasons);
-            }
             setTempStatus(status);
         }
     };
 
     const handleProgressChange = (e) => {
+        /* Prevents non-numeric input */
         setProgress(e.target.value === '' ? 0 : Number(e.target.value));
+        const currentSeason = media?.seasons.findLast(season => {
+            return season[1] <= progress;
+        })
+        setProgressSeasons(currentSeason ? currentSeason[0] : 0);
         if (e.target.value == media?.progress_max) {
-            if ( media?.progress_seasons_max ) {
-                setProgressSeasons(media?.progress_seasons_max);
-            }
             setStatus('completed');
         } else if (e.target.value == 0) {
-            if ( media?.progress_seasons_max ) {
-                setProgressSeasons(0);
-            }
             setStatus('backlog');
         } else {
-            console.log(tempStatus);
             setStatus(tempStatus);
             setTempProgress(progress);
         }
     }
 
     const handleSeasonChange = (e) => {
-        setProgressSeasons(e.target.value === '' ? 0 : Number(e.target.value));
-        if (e.target.value == media?.progress_seasons_max) {
+        setProgressSeasons(e.target.value);
+        setProgress(e.target.value != 0 ? media?.seasons.find(season => season[0] == e.target.value)[1] : 0);
+        if (e.target.value == media?.seasons.length) {
             setProgress(media?.progress_max);
             setStatus('completed');
+        } else if (e.target.value == 0) {
+            setStatus('backlog');
         } else {
             setStatus(tempStatus);
-            setTempSeasons(progress_seasons);
+            setTempProgress(progress);
         }
     }
 
@@ -160,8 +156,18 @@ const Details = (props) => {
                 onChange={handleProgressChange}
                 max={media?.progress_max}
                 valueLabelDisplay="auto"
-                aria-labelledby="input-slider"
-                sx={{ mb: 1, display: { xs: 'none', sm: 'flex' }}}
+                aria-labelledby="progress-slider"
+                sx={{ mb: 4, display: { xs: 'none', sm: 'flex' }}}
+                marks={
+                    media?.seasons ?
+                    media.seasons.map(season => {
+                        return {
+                            value: season[1],
+                            label: 'S' + season[0]
+                        }
+                    })
+                    : null
+                }
             />
             <Stack spacing={1} direction={{ sm: 'column', md: 'row' }} flexDirection="flex-start" >
                 <FormControl variant="outlined">
@@ -181,14 +187,14 @@ const Details = (props) => {
                     <FormHelperText id="season-helper-text">{types[type]?.progress}</FormHelperText>
                 </FormControl>
                 {
-                    type === 'tv' ?
+                    media?.seasons ?
                         <FormControl variant="outlined">
                             <OutlinedInput
                                 id="season-number-input"
                                 type="number"
-                                inputProps={{ min: 0, max: media?.progress_seasons_max }}
-                                value={progress_seasons}
-                                endAdornment={<InputAdornment position="end"> / {media?.progress_seasons_max}</InputAdornment>}
+                                inputProps={{ min: 0, max: media?.seasons.length }}
+                                value={progressSeasons}
+                                endAdornment={<InputAdornment position="end"> / {media?.seasons.length}</InputAdornment>}
                                 onChange={handleSeasonChange}
                                 sx={{ maxWidth: '12ch' }}
                             />

@@ -1,6 +1,6 @@
 import { useState, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Tooltip, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button } from '@mui/material';
+import { Card, Box, Stack, CardActions, CardContent, CardMedia, IconButton, Tooltip, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button, LinearProgress, linearProgressClasses, styled } from '@mui/material';
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -51,6 +51,18 @@ const LibraryCard = ({media}) => {
         setIdToDelete(e.currentTarget.value);
         setOpenConfirmation(true);
     }
+
+    const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+        height: 10,
+        borderRadius: 5,
+        [`&.${linearProgressClasses.colorPrimary}`]: {
+          backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+        },
+        [`& .${linearProgressClasses.bar}`]: {
+          borderRadius: 5,
+          backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8',
+        },
+    }));
     
     const renderLibraryCard = 
         <Card sx={{ maxWidth: 200, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
@@ -79,20 +91,13 @@ const LibraryCard = ({media}) => {
                     : null
                 }
             </Box>
-            {/* Progress (with seasons for tv shows) */}
+            <Box>
             <CardContent >
-                <Typography variant="body2" color="text.secondary">
-                    {media.progress} / {media.progress_max} {types[type]?.progress}
+                <BorderLinearProgress variant="determinate" value={Math.round(media.progress / media?.progress_max * 100)} />
+                <Typography variant="body2" color="text.secondary" sx={{mt: 2}}>
+                        {media.progress} / {media.progress_max} {types[type]?.progress}
                 </Typography>
-                {
-                    type === 'tv' ?
-                    <Typography variant="body2" color="text.secondary">
-                        {media.progress_seasons} / {media.progress_seasons_max} seasons
-                    </Typography>
-                    :null
-                }
-                {/* Rating (if any) */}
-                { media.rating != 0 ? <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly /> : null }
+                <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly />
             </CardContent >
             <CardActions sx={{ display: 'flex', justifyContent:'flex-end' }}>
                 <Tooltip title="Edit" placement="top">
@@ -114,6 +119,7 @@ const LibraryCard = ({media}) => {
                     </IconButton>
                 </Tooltip>
             </CardActions>
+            </Box>
         </Card>
 
     return (
