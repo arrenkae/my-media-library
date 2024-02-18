@@ -26,7 +26,7 @@ const style = {
 };
 
 const Details = (props) => {
-    const { type, detailsFetchId, openDetails, handleCloseDetails, setSearchResults, showNotification } = useContext(LibraryContext);
+    const { type, detailsFetchId, openDetails, handleCloseDetails, showNotification } = useContext(LibraryContext);
     const fullLibrary = useSelector(state => state.media.library);
     const [media, setMedia] = useState();
     const [status, setStatus] = useState('backlog');
@@ -46,6 +46,7 @@ const Details = (props) => {
         try {
             const response = await axios.get(`${BASE_URL}/details/${type}/${detailsFetchId}`);
             if (response.status === 200) {
+                /* If the media already exists in the library, fetches and updates the detail in case there is new info */
                 const existingMedia = fullLibrary.find(element => element.api_id == detailsFetchId && element.type === type);
                 if (existingMedia) {
                     setMedia({...existingMedia, ...response.data.media});
@@ -87,8 +88,9 @@ const Details = (props) => {
                 <Typography id="modal-title" variant="h4" gutterBottom color="textPrimary">
                     {media.title}
                 </Typography>
+                {/* Author is only displayed for books */}
                 {
-                    type === 'book' ? 
+                    media.author ? 
                     <Typography id="book-author" variant="h5" gutterBottom color="textPrimary">
                         {media.author}
                     </Typography>
@@ -97,7 +99,7 @@ const Details = (props) => {
                 <Typography id="release-date" variant="h6" color="textPrimary" gutterBottom>
                     { media.released ? media.release_date ? 'Release date: ' + media.release_date : 'Release date: unknown' : 'Not yet released' }
                 </Typography>
-                {/* Shows the release date as 'planned release date' if it's in the future */}
+                {/* Shows the release date as 'planned release date' if it's in the future (or doesn't if there is no date) */}
                 {
                     (!media.released && media.release_date) ?
                     <Typography id="planned-release-date" variant="h6" color="textPrimary" gutterBottom>
@@ -112,7 +114,7 @@ const Details = (props) => {
                     {/* Uses html parser since descriptions from google books contain html tags */}
                     {media.description ? parse(`<p>${media.description}</p>`) : null}
                 </Typography>
-                {/* Progress, rating and status other than backlog are only available for the released titles */}
+                {/* Progress, rating and status options other than backlog are only available for the released titles */}
                 { media.released ?
                     <DetailsReleased
                         media={media}

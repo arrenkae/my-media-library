@@ -1,8 +1,7 @@
 import { useState, useEffect, createContext, memo } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Stack, Box, Tabs, Tab, Divider } from '@mui/material';
-import PropTypes from 'prop-types';
 import { setMessage } from "../features/media/mediaSlice";
 import { useLibrarySelect, useFilterType } from "../features/media/mediaHooks";
 import LibraryData from './LibraryData';
@@ -57,12 +56,14 @@ const Library = ({type, search}) => {
     const navigate = useNavigate();
     const selectType = useFilterType();
 
+    /* Default type can be potentially changed so it's better to keep it as a variable */
     useEffect(()=>{
         if (!type) {
             navigate(`/library/${defaultType}`);
         }
     }, [])
 
+    /* Filters and returns user library based on the current page and user id from the token */
     useEffect(()=>{
         selectType(type);
     }, [type])
@@ -88,11 +89,11 @@ const Library = ({type, search}) => {
         setOpenDetails(false);
     };
 
-    /* Media type is stored in the redux store, used to filter the displayed library and get pamareters for the API search */
     const handleChangeType = (event, newValue) => {
         navigate(`/library/${newValue}`);
     }
 
+    /* Function to display notification is stored in the LibraryContext to pass it to different components that might need to open it */
     const showNotification = (text, type) => {
         setNotification(text);
         setNotificationType(type);
@@ -116,7 +117,7 @@ const Library = ({type, search}) => {
             setOpenNotification,
             showNotification
             }}>
-            {/* Tabs to select the media type */}
+            {/* Tab menu to select the media type */}
             <Box sx={{ width: '100%' }}>
                 <Tabs value={type} onChange={handleChangeType} aria-label="type-select" role="navigation">
                     <Tab label="TV" value="tv" />
@@ -137,4 +138,4 @@ const Library = ({type, search}) => {
     )
 };
 
-export default Library;
+export default memo(Library);

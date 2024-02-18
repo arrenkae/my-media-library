@@ -3,12 +3,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+/* Data from different external APIs returned in the same format */
+
 export const getTVDetails = async(req, res) => {
     const {id} = req.params;
     try {
         const APIresponse = await axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.TV_MOVIES_API_KEY}`);
+        /* Filters out 'specials' seasons that are not part of the main show and future seasons since they mess up progress tracking */
         const media_seasons = APIresponse.data.seasons.filter(season => season.name.startsWith('Season') && season.air_date && new Date(season.air_date).getTime() < new Date().getTime());
-        console.log(media_seasons);
         const media = {
             api_id: APIresponse.data.id,
             type: 'tv',
@@ -16,13 +18,16 @@ export const getTVDetails = async(req, res) => {
             image: APIresponse.data.poster_path ? `https://image.tmdb.org/t/p/w200${APIresponse.data.poster_path}` : null,
             description: APIresponse.data.overview,
             release_date: APIresponse.data.first_air_date,
+            /* Checks if the released date in the future to determine if media is released or not */
             released: APIresponse.data.first_air_date ? new Date(APIresponse.data.first_air_date).getTime() < new Date().getTime() : false,
             update_date: APIresponse.data.last_air_date,
+            /* Counts total for all seasons to avoid discrepancies between seasons episode count and number_of_episodes value */
             progress_max: media_seasons.length > 0 ?
                 media_seasons.reduce((total, season) => {
                     return total + season.episode_count;
                 }, 0)
                 : APIresponse.data.number_of_episodes,
+            /* Seasons data is saved only for shows with more than 1 season */
             seasons: media_seasons.length > 1 ?
                 media_seasons.map((season, index) => [
                     index+1,

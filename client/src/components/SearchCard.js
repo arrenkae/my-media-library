@@ -1,5 +1,4 @@
 import { useContext, memo } from "react";
-import { useSelector } from "react-redux";
 import { Card, Box, CardContent, CardMedia, Fab, Typography, Tooltip } from '@mui/material';
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import AddIcon from '@mui/icons-material/Add';
@@ -28,6 +27,7 @@ const SearchCard = ({media}) => {
                 <Typography id="card-title" variant="h6" gutterBottom>
                         {media.title}
                 </Typography>
+            {/* Author is only displayed for books */}
             {   
                 media.author ?
                 <Typography id="card-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>

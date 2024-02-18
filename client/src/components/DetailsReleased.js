@@ -5,10 +5,14 @@ import { types, statusNames, LibraryContext } from "./Library";
 const DetailsReleased = ({media, status, setStatus, progress, setProgress, rating, setRating}) => {
     const { type } = useContext(LibraryContext);
     const [progressSeasons, setProgressSeasons] = useState(0);
-    const [tempProgress, setTempProgress] = useState();
+    /* tempProgress allows to go back to previous progress after it got automatically change on completed/backlog state */
+    const [tempProgress, setTempProgress] = useState(media.progress || 0);
+    /* Prevents completed and backlog media from being stuck on progress change */
+    const [tempStatus, setTempStatus] = useState(media.status ? ((media.status != 'completed') && (media.status != 'backlog')) ? media.status : 'active' : 'active');
 
     useEffect(()=>{
-        if (media.progress) setTempProgress(media.progress);
+        /* media.seasons is stored as an integer array, season[0] is season number, season[1] is the number (total) of the last episode of the season
+        * Finding the last episode count <= than current progress we get the number of completed seasons */
         if (media.seasons) {
             const currentSeason = media.seasons.findLast(season => {
                 return season[1] <= progress;
@@ -18,6 +22,7 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
     }, [])
 
     const handleStatusChange = (e) => {
+        /* On completed progress automatically sets to maximum, on backlog to 0; then, if the user decides to switch back, progress is restored to its previous value */
         setStatus(e.target.value);
         if (e.target.value === 'completed') {
             setProgress(media.progress_max);
@@ -31,10 +36,18 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
             }
         } else {
             setProgress(tempProgress);
+            if (media.seasons) {
+                const currentSeason = media.seasons.findLast(season => {
+                    return season[1] <= tempProgress;
+                })
+                setProgressSeasons(currentSeason ? currentSeason[0] : 0);
+            }
+            setTempStatus(e.target.value);
         }
     };
 
     const handleProgressChange = (e) => {
+        /* Same as handleStatusChange but sets appropriate statuses on min and max progress */
         /* Prevents non-numeric input */
         setProgress(e.target.value === '' ? 0 : Number(e.target.value));
         if (media.seasons) {
@@ -48,12 +61,13 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
         } else if (e.target.value == 0) {
             setStatus('backlog');
         } else {
-            setStatus(media.status ? (media.status != 'backlog' && media.status != 'completed') ? media.status : 'active' : 'active');
-            setTempProgress(progress);
+            setStatus(tempStatus);
+            setTempProgress(e.target.value);
         }
     }
 
     const handleSeasonChange = (e) => {
+        /* On season change, progress is set to exact number of episodes from the beginning to the end of the season */
         setProgressSeasons(e.target.value);
         setProgress(e.target.value != 0 ? media.seasons.find(season => season[0] == e.target.value)[1] : 0);
         if (e.target.value == media.seasons.length) {
@@ -62,8 +76,8 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
         } else if (e.target.value == 0) {
             setStatus('backlog');
         } else {
-            setStatus(media.status ? (media.status != 'backlog' && media.status != 'completed') ? media.status : 'active' : 'active');
-            setTempProgress(progress);
+            setStatus(tempStatus);
+            setTempProgress(e.target.value != 0 ? media.seasons.find(season => season[0] == e.target.value)[1] : 0);
         }
     }
 
@@ -78,6 +92,7 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
                     label="Status"
                     onChange={handleStatusChange}
                     >
+                {/* Replaces the status verb depending on the current media type */}
                 { Object.keys(statusNames).map(status => <MenuItem key={status} value={status}>{statusNames[status].replace('verb', types[type].verb)}</MenuItem>) }
                 </Select>
             </FormControl>
@@ -90,8 +105,9 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
                     setRating(newValue);
                 }}
             />
+            {/* Displays progress percentage */}
             <Typography id="input-slider" gutterBottom>
-                    Progress: {Math.round(progress / media.progress_max * 100)}%
+                Progress: {Math.round(progress / media.progress_max * 100)}%
             </Typography>
             {/* Slider and the number input form display the same value and if one changes the other changes as well */}
             <Slider
@@ -129,6 +145,7 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
                     />
                     <FormHelperText id="season-helper-text">{types[type]?.progress}</FormHelperText>
                 </FormControl>
+                {/* Only tv shows have seasons, also not displayed for shows with only 1 season since they don't need to split progress between seasons*/}
                 {
                     media.seasons ?
                         <FormControl variant="outlined">

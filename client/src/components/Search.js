@@ -34,6 +34,7 @@ const Search = (props) => {
     setSearchResults([]);
     setError();
     if (query) {
+      {/* Adds search params to the url */}
       navigate(`/library/${type}/search?q=${encodeURIComponent(query)}`);
       getSearchResults();
     } else {
@@ -41,10 +42,12 @@ const Search = (props) => {
     }
   }
 
+  {/* Navigating back to main library/type route hides the search results */}
   const handleClear = (e) => {
     navigate(`/library/${type}`);
   }
 
+  {/* Search error displayed directly under the search results for convenience instead of opening the snackbar */}
   const showError = (message) => {
     setError(message);
     setTimeout(() => { setError() }, 5000);
@@ -81,7 +84,6 @@ const Search = (props) => {
               onChange={(e) => setQuery(e.target.value)}
             />
             <Button variant="text" type="submit" onClick={handleSearch}>Search</Button>
-            {/* Clear button both resets the search fields and hides the search results */}
             <Tooltip title="Clear" placement="top">
               <IconButton aria-label="clear-button" color='primary' size="small" onClick={handleClear}>
                 <ClearIcon fontSize="small" />

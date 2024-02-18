@@ -9,13 +9,14 @@ import { useGetMedia } from "../features/media/mediaHooks";
 import { LibraryContext, types, statusNames } from "./Library";
 
 const LibraryCard = ({media}) => {
-    const { type, handleOpenDetails, showNotification } = useContext(LibraryContext);
+    const { type, handleOpenDetails } = useContext(LibraryContext);
     const [ openConfirmation, setOpenConfirmation ] = useState(false);
     const [ idToDelete, setIdToDelete ] = useState();
     const dispatch = useDispatch();
 
     const getMedia = useGetMedia();
 
+    /* Colors for the chip displaying status */
     const chipColor = () => {
         switch (media.status) {
             case 'backlog':
@@ -33,6 +34,7 @@ const LibraryCard = ({media}) => {
         }
     }
 
+    /* Style for the progress bar */
     const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
         height: 10,
         borderRadius: 5,
@@ -83,6 +85,7 @@ const LibraryCard = ({media}) => {
                 <Typography id="card-title" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
                     {media.title}
                 </Typography>
+                {/* Author is only displayed for books */}
                 {   
                     media.author ?
                     <Typography id="card-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
@@ -93,6 +96,7 @@ const LibraryCard = ({media}) => {
             </Box>
             <Box>
             <CardContent >
+                {/* Progress bar displays progress % visually, in addition to numeric value */}
                 <BorderLinearProgress variant="determinate" value={Math.round(media.progress / media?.progress_max * 100)} />
                 <Typography variant="body2" color="text.secondary" sx={{mt: 2}}>
                         {media.progress} / {media.progress_max} {types[type]?.progress}
@@ -103,7 +107,7 @@ const LibraryCard = ({media}) => {
                 <Tooltip title="Edit" placement="top">
                     <IconButton
                         aria-label="edit"
-                        /* Opens the edit component */
+                        /* Opens the Details component; for existing media, it will update external data if necessary */
                         onClick={() => handleOpenDetails(media.api_id)}
                     >
                         <EditIcon />

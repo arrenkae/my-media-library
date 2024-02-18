@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+/* Data from different external APIs returned in the same format */
+
 export const getTV = async(req, res) => {
     const {query} = req.params;
     try {
