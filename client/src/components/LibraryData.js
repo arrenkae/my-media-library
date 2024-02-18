@@ -7,11 +7,9 @@ import LibraryCard from './LibraryCard';
 import LibraryFilters from './LibraryFilters';
 
 const LibraryData = (props) => {
-    const { library } = useContext(LibraryContext);
+    const { type, library } = useContext(LibraryContext);
     const fullLibrary = useSelector(state => state.media.library);
     const loadStatus = useSelector(state => state.media.load);
-
-    const type = useSelector(state => state.media.type);
 
     const getMedia = useGetMedia();
 
@@ -23,7 +21,7 @@ const LibraryData = (props) => {
     const renderLibrary = 
         <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
             <Typography id="library-header" variant="h3" color="text.primary" gutterBottom>
-                My {types[type].typename}
+                My {types[type]?.typename}
             </Typography>
             <LibraryFilters />
             { library?.length > 0 ?

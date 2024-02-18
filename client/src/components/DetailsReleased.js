@@ -1,11 +1,10 @@
-import { memo } from "react";
+import { useContext, memo } from "react";
 import { useSelector } from "react-redux";
 import { Typography, FormControl, Rating, Slider, Stack, InputAdornment, OutlinedInput, FormHelperText } from '@mui/material';
-import _ from 'lodash';
-import { types } from "./Library";
+import { types, LibraryContext } from "./Library";
 
 const DetailsReleased = ({media, progress, setProgress, progress_seasons, setProgressSeasons, rating, setRating}) => {
-    const type = useSelector(state => state.media.type);
+    const { type } = useContext(LibraryContext);
 
     const handleProgressChange = (e) => {
         setProgress(e.target.value === '' ? 0 : Number(e.target.value));
@@ -27,7 +26,7 @@ const DetailsReleased = ({media, progress, setProgress, progress_seasons, setPro
                 }}
             />
             <Typography id="input-slider" gutterBottom>
-                    Progress: {progress} / {media.progress_max} {types[type].progress}
+                    Progress: {progress} / {media.progress_max} {types[type]?.progress}
             </Typography>
             {/* Slider and the number input form display the same value and if one changes the other changes as well */}
             <Slider

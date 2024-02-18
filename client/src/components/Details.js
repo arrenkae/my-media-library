@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from 'react-router-dom';
 import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, CircularProgress, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import axios from "axios";
@@ -25,9 +26,8 @@ const style = {
 };
 
 const Details = (props) => {
-    const { detailsFetchId, openDetails, handleCloseDetails, setSearchResults, showNotification } = useContext(LibraryContext);
+    const { type, detailsFetchId, openDetails, handleCloseDetails, setSearchResults, showNotification } = useContext(LibraryContext);
     const fullLibrary = useSelector(state => state.media.library);
-    const type = useSelector(state => state.media.type);
     const [media, setMedia] = useState();
     const [status, setStatus] = useState('backlog');
     const [progress, setProgress] = useState(0);
@@ -35,6 +35,7 @@ const Details = (props) => {
     const [rating, setRating] = useState(0);
     const prevProgressRef = useRef();
     
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const getMedia = useGetMedia();
 
@@ -85,7 +86,7 @@ const Details = (props) => {
         }))
         .then(() => {
             handleCloseDetails();
-            setSearchResults([]);
+            navigate(`/library/${type}`);
         })
         .then(() => getMedia())
     }

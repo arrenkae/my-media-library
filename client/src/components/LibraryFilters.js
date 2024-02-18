@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { useContext, memo } from 'react';
 import { useSelector } from "react-redux";
 import { ToggleButton, ToggleButtonGroup, Stack, Select, InputLabel, MenuItem, FormControl, Paper, InputBase, Tooltip, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -6,10 +6,10 @@ import ClearIcon from '@mui/icons-material/Clear';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useFilterStatus, useSelectSort, useReverseSort, useSearchLibrary } from "../features/media/mediaHooks";
-import { types, statusNames } from './Library';
+import { types, statusNames, LibraryContext } from './Library';
 
 const LibraryFilters = (props) => {
-    const type = useSelector(state => state.media.type);
+    const { type } = useContext(LibraryContext);
     const status = useSelector(state => state.media.status);
     const search = useSelector(state => state.media.search);
     const sort = useSelector(state => state.media.sort);
@@ -21,7 +21,12 @@ const LibraryFilters = (props) => {
     const reverseSort = useReverseSort();
 
     const handleStatusChange = (e, newStatus) => {
-        filterStatus(newStatus);
+        /* Prevent empty results on deselect */
+        if (newStatus) {
+            filterStatus(newStatus);
+        } else {
+            filterStatus('all');
+        }
     }
 
     const handleSearch = (e) => {

@@ -7,10 +7,9 @@ import { LibraryContext } from "./Library";
 import LibraryCard from "./LibraryCard";
 
 const SearchCard = ({media}) => {
-    const { library, handleOpenDetails } = useContext(LibraryContext);
-    const type = useSelector(state => state.media.type);
+    const { type, library, handleOpenDetails } = useContext(LibraryContext);
     /* Checks if the media is already in the library and if so displays the library card instead; it can then be updated */
-    const existingMedia = library.find(element => element.api_id == media.id && element.type == type);
+    const existingMedia = library.find(element => element.api_id == media.api_id && element.type == type);
 
     const renderLibraryCard = 
         <Card sx={{ maxWidth: 200, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
@@ -31,7 +30,7 @@ const SearchCard = ({media}) => {
                 </Typography>
             {   
                 media.author ?
-                <Typography id="book-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
+                <Typography id="card-author" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
                     {media.author}
                 </Typography>
                 : null

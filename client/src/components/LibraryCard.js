@@ -9,10 +9,9 @@ import { useGetMedia } from "../features/media/mediaHooks";
 import { LibraryContext, types, statusNames } from "./Library";
 
 const LibraryCard = ({media}) => {
-    const { handleOpenDetails, showNotification } = useContext(LibraryContext);
+    const { type, handleOpenDetails, showNotification } = useContext(LibraryContext);
     const [ openConfirmation, setOpenConfirmation ] = useState(false);
     const [ idToDelete, setIdToDelete ] = useState();
-    const type = useSelector(state => state.media.type);
     const dispatch = useDispatch();
 
     const getMedia = useGetMedia();

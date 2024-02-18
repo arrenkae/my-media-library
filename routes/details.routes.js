@@ -4,7 +4,7 @@ import { getTVDetails, getMovieDetails, getBookDetails } from '../controllers/de
 const details_router = express.Router();
 
 details_router.get('/tv/:id', getTVDetails);
-details_router.get('/movie/:id', getMovieDetails);
-details_router.get('/book/:id', getBookDetails);
+details_router.get('/movies/:id', getMovieDetails);
+details_router.get('/books/:id', getBookDetails);
 
 export default details_router;

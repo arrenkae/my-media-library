@@ -1,6 +1,8 @@
 import { useState, useEffect, createContext, memo } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { Stack, Tabs, Tab, Divider } from '@mui/material';
+import { useNavigate, Link } from 'react-router-dom';
+import { Stack, Box, Tabs, Tab, Divider } from '@mui/material';
+import PropTypes from 'prop-types';
 import { setMessage } from "../features/media/mediaSlice";
 import { useLibrarySelect, useFilterType } from "../features/media/mediaHooks";
 import LibraryData from './LibraryData';
@@ -18,12 +20,12 @@ export const types = {
         progress: 'episodes',
         verb: 'Watch'
     },
-    movie: {
+    movies: {
         typename: 'movies',
         progress: 'minutes',
         verb: 'Watch'
     },
-    book: {
+    books: {
         typename: 'books',
         progress: 'pages',
         verb: 'Read'
@@ -39,13 +41,11 @@ export const statusNames = {
     dropped: 'Dropped'
 }
 
-const Library = (props) => {
+const Library = ({type, search}) => {
     /* Custom hook returns library with all the current filters applied */
     const library = useLibrarySelect();
-    const type = useSelector(state => state.media.type);
     const message = useSelector(state => state.media.message);
     const loadStatus = useSelector(state => state.media.load);
-    const [searchResults, setSearchResults] = useState([]);
     const [openDetails, setOpenDetails] = useState(false);
     const [detailsFetchId, setDetailsFetchId] = useState();
     const [openNotification, setOpenNotification] = useState(false);
@@ -53,8 +53,17 @@ const Library = (props) => {
     const [notificationType, setNotificationType] = useState();
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const selectType = useFilterType();
 
+    useEffect(()=>{
+        console.log(type);
+    }, [])
+
+    useEffect(()=>{
+        selectType(type);
+    }, [type])
+    
     useEffect(()=>{
         if (loadStatus === 'failed' && message) {
             showNotification(message, 'error');
@@ -78,8 +87,7 @@ const Library = (props) => {
 
     /* Media type is stored in the redux store, used to filter the displayed library and get pamareters for the API search */
     const handleChangeType = (event, newValue) => {
-        selectType(newValue);
-        setSearchResults([]);
+        navigate(`/library/${newValue}`);
     }
 
     const showNotification = (text, type) => {
@@ -92,9 +100,9 @@ const Library = (props) => {
         <>
         <TopBar />
         <LibraryContext.Provider value={{
+            type,
+            search,
             library,
-            searchResults,
-            setSearchResults,
             openDetails,
             setOpenDetails,
             detailsFetchId,
@@ -106,13 +114,13 @@ const Library = (props) => {
             showNotification
             }}>
             {/* Tabs to select the media type */}
-            <Stack sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={type} onChange={handleChangeType} aria-label="type-select">
+            <Box sx={{ width: '100%' }}>
+                <Tabs value={type} onChange={handleChangeType} aria-label="type-select" role="navigation">
                     <Tab label="TV" value="tv" />
-                    <Tab label="Movies" value="movie" />
-                    <Tab label="Books" value="book" />
+                    <Tab label="Movies" value="movies" />
+                    <Tab label="Books" value="books" />
                 </Tabs>
-            </Stack>
+            </Box>
             <Stack>
                 <Search />
                 <Divider />
@@ -126,4 +134,4 @@ const Library = (props) => {
     )
 };
 
-export default memo(Library);
+export default Library;

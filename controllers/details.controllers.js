@@ -32,8 +32,8 @@ export const getMovieDetails = async(req, res) => {
         const APIresponse = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.TV_MOVIES_API_KEY}`);
         const media = {
             api_id: APIresponse.data.id,
-            type: 'movie',
-            title: APIresponse.data.name,
+            type: 'movies',
+            title: APIresponse.data.title,
             image: APIresponse.data.poster_path ? `https://image.tmdb.org/t/p/w200${APIresponse.data.poster_path}` : null,
             description: APIresponse.data.overview,
             release_date: APIresponse.data.release_date,
@@ -51,10 +51,9 @@ export const getBookDetails = async(req, res) => {
     const {id} = req.params;
     try {
         const APIresponse = await axios.get(`https://www.googleapis.com/books/v1/volumes/${id}?key=${process.env.BOOKS_API_KEY}`);
-        console.log(APIresponse.data);
         const media = {
             api_id: APIresponse.data.id,
-            type: 'book',
+            type: 'books',
             title: APIresponse.data.volumeInfo.title,
             author: APIresponse.data.volumeInfo.authors ? APIresponse.data.volumeInfo.authors[0] : null,
             image: APIresponse.data.volumeInfo.imageLinks?.thumbnail ? APIresponse.data.volumeInfo.imageLinks?.thumbnail : null,

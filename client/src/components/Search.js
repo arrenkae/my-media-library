@@ -1,5 +1,5 @@
-import { useSelector } from "react-redux";
 import { useState, useEffect, useContext, memo } from "react";
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Paper, InputBase, Button, IconButton, Alert, Typography, Stack, Tooltip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -10,31 +10,39 @@ import { LibraryContext, types } from "./Library";
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Search = (props) => {
-  const type = useSelector(state => state.media.type);
-  const { searchResults, setSearchResults } = useContext(LibraryContext);
-  const [query, setQuery] = useState('');
+  const { type, search } = useContext(LibraryContext);
+  const [searchResults, setSearchResults] = useState([]);
   const [error, setError] = useState();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+  
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    if (query) {
+      getSearchResults();
+    }
+  }, []);
 
   useEffect(()=>{
     setError();
-    setQuery('');
+    setSearchResults([]);
   }, [type]);
 
-  const handleQuery = (e) => {
-    setQuery(e.target.value);
-  }
-
-  const handleSearch = () => {
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearchResults([]);
+    setError();
     if (query) {
-      search();
+      navigate(`/library/${type}/search?q=${encodeURIComponent(query)}`);
+      getSearchResults();
     } else {
       showError('Search field is empty');
     }
   }
 
   const handleClear = (e) => {
-    setSearchResults([]);
-    setQuery('');
+    navigate(`/library/${type}`);
   }
 
   const showError = (message) => {
@@ -42,15 +50,11 @@ const Search = (props) => {
     setTimeout(() => { setError() }, 5000);
   }
 
-  const search = async() => {
-    setSearchResults([]);
-    setError();
+  const getSearchResults = async() => {
     try {
-        /* Constructs an API link depending on the media type using the template object */
         const response = await axios.get(`${BASE_URL}/search/${type}/${query}`);
         if (response.status === 200) {
-          /* Query is saved in the results so that it can be displayed in the SearchData title */
-          setSearchResults({query, results: response.data.results});
+          setSearchResults(response.data.results);
           setQuery('');
         }
     } catch (error) {
@@ -62,7 +66,7 @@ const Search = (props) => {
     <>
       <Stack spacing={2} direction="column" alignItems="flex-start" sx={{ m: 5 }}>
           <Typography id="search-header" variant="h6" color="textSecondary">
-              Search for new {types[type].typename}
+              Search for new {types[type]?.typename}
           </Typography>
           {/* Search field */}
           <Paper
@@ -73,13 +77,10 @@ const Search = (props) => {
             <InputBase
               sx={{ ml: 1, flex: 1 }}
               inputProps={{ 'aria-label': 'search new media' }}
-              onChange={handleQuery}
               value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
-            <Button variant="text" type="submit" onClick={(e) => {
-              e.preventDefault();
-              handleSearch();
-            }}>Search</Button>
+            <Button variant="text" type="submit" onClick={handleSearch}>Search</Button>
             {/* Clear button both resets the search fields and hides the search results */}
             <Tooltip title="Clear" placement="top">
               <IconButton aria-label="clear-button" color='primary' size="small" onClick={handleClear}>
@@ -89,7 +90,7 @@ const Search = (props) => {
           </Paper>
           {error ? <Alert variant="outlined" sx={{ maxWidth: 380 }} severity="error">{error}</Alert> : null}
       </Stack>
-      {searchResults ? <SearchData /> : null}
+      {(search && searchResults.length > 0) ? <SearchData searchResults={searchResults} /> : null}
     </>
   );
 };

@@ -88,7 +88,7 @@ const mediaSlice = createSlice({
     builder.addCase(saveMedia.fulfilled, (state, action) => {
       /* Doesn't need to save to the state.library because Details component immediately updates the library after saving */
       state.load = 'succeded';
-      state.message = 'Saved!';
+      state.message = 'Library updated';
     });
     builder.addCase(saveMedia.rejected, (state, action) => {
       state.load = 'failed';
@@ -99,7 +99,7 @@ const mediaSlice = createSlice({
     });
     builder.addCase(deleteMedia.fulfilled, (state, action) => {
       state.load = 'succeded';
-      state.message = 'Deleted!';
+      state.message = 'Deleted successfully';
     });
     builder.addCase(deleteMedia.rejected, (state, action) => {
       state.load = 'failed';

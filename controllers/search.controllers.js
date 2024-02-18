@@ -33,7 +33,7 @@ export const getMovies = async(req, res) => {
             const results = APIresponse.data.results.map(media => {
                 return {
                     api_id: media.id,
-                    title: media.name,
+                    title: media.title,
                     image: media.poster_path ? `https://image.tmdb.org/t/p/w200${media.poster_path}` : null,
                 }
             })
@@ -53,7 +53,6 @@ export const getBooks = async(req, res) => {
         const APIresponse = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=20&api_key=${process.env.BOOKS_API_KEY}`);
         if (APIresponse.data.totalItems > 0) {
             const results = APIresponse.data.items.map(media => {
-                console.log(media);
                 return {
                     api_id: media.id,
                     title: media.volumeInfo.title,
