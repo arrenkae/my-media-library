@@ -85,7 +85,7 @@ const LibraryFilters = (props) => {
                     <ToggleButton value="all">All</ToggleButton>
                     {
                         /* Returns status display names changing them according to type (active => watching/reading) */
-                        Object.keys(statusNames).map(status => <ToggleButton value={status}>{statusNames[status].replace('verb', types[type].verb)}</ToggleButton>)
+                        Object.keys(statusNames).map(status => <ToggleButton value={status}>{statusNames[status].replace('verb', types[type]?.verb)}</ToggleButton>)
                     }
                 </ToggleButtonGroup>
                 {/* Selector for sorting type */}

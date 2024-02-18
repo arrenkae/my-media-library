@@ -46,6 +46,7 @@ const Library = ({type, search}) => {
     const library = useLibrarySelect();
     const message = useSelector(state => state.media.message);
     const loadStatus = useSelector(state => state.media.load);
+    const defaultType = useSelector(state => state.media.type);
     const [openDetails, setOpenDetails] = useState(false);
     const [detailsFetchId, setDetailsFetchId] = useState();
     const [openNotification, setOpenNotification] = useState(false);
@@ -57,7 +58,9 @@ const Library = ({type, search}) => {
     const selectType = useFilterType();
 
     useEffect(()=>{
-        console.log(type);
+        if (!type) {
+            navigate(`/library/${defaultType}`);
+        }
     }, [])
 
     useEffect(()=>{

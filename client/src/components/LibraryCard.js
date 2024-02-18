@@ -67,7 +67,7 @@ const LibraryCard = ({media}) => {
                     </Box>
                 }
                 {/* Status chip is customized with different color for different statuses and different display names based on the media */}
-                <Chip label={statusNames[media.status].replace('verb', types[type].verb)} sx={{ mt: 2, mb: 2, width: '80%' }} color={chipColor()} />
+                <Chip label={statusNames[media.status].replace('verb', types[type]?.verb)} sx={{ mt: 2, mb: 2, width: '80%' }} color={chipColor()} />
                 <Typography id="card-title" variant="h6" gutterBottom sx={{ maxWidth: '92%' }}>
                     {media.title}
                 </Typography>
@@ -82,7 +82,7 @@ const LibraryCard = ({media}) => {
             {/* Progress (with seasons for tv shows) */}
             <CardContent >
                 <Typography variant="body2" color="text.secondary">
-                    {media.progress} / {media.progress_max} {types[type].progress}
+                    {media.progress} / {media.progress_max} {types[type]?.progress}
                 </Typography>
                 {
                     type === 'tv' ?

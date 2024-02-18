@@ -1,11 +1,9 @@
-import { useContext, memo } from "react";
+import { memo } from "react";
 import { useSearchParams } from 'react-router-dom';
 import { Grid, Box, Typography } from '@mui/material';
 import SearchCard from "./SearchCard";
-import { LibraryContext } from "./Library";
 
 const SearchData = ({searchResults}) => {
-    const { type, search } = useContext(LibraryContext);
     const [searchParams, setSearchParams] = useSearchParams();
 
     return (
