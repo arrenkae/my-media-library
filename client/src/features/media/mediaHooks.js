@@ -7,9 +7,9 @@ export const useLibrarySelect = () => {
     const selectorLibrary = createSelector([library, type, status, search, sort, ascending], (library, type, status, search, sort, ascending) => {
         /* Creates a single filtering function based on different filter parameters */
         const filtering = (media) => {
-            return media.type == type && 
+            return media.type === type && 
             ( search ? media.title.toLowerCase().includes(search.toLowerCase()) : true ) &&
-            ( status != 'all' ? media.status == status : true )
+            ( status !== 'all' ? media.status === status : true )
         };
         switch (sort) {
             case 'updated':

@@ -36,7 +36,7 @@ const LibraryFilters = (props) => {
     /* Default ascending/descending toggle positions are different depending on the sorting type */
     const handleSort = (e) => {
         selectSort(e.target.value);
-        if ((e.target.value === 'name' && ascending === false) || (e.target.value != 'name' && ascending === true)) {
+        if ((e.target.value === 'name' && ascending === false) || (e.target.value !== 'name' && ascending === true)) {
             reverseSort();
         }
     }
@@ -85,7 +85,7 @@ const LibraryFilters = (props) => {
                     <ToggleButton value="all">All</ToggleButton>
                     {
                         /* Returns status display names changing them according to type (active => watching/reading) */
-                        Object.keys(statusNames).map(status => <ToggleButton value={status}>{statusNames[status].replace('verb', types[type]?.verb)}</ToggleButton>)
+                        Object.keys(statusNames).map(status => <ToggleButton key={status} value={status}>{statusNames[status].replace('verb', types[type]?.verb)}</ToggleButton>)
                     }
                 </ToggleButtonGroup>
                 {/* Selector for sorting type */}
@@ -106,7 +106,7 @@ const LibraryFilters = (props) => {
                         </Select>
                     </FormControl>
                     {/* Toggle between ascending and descending sort changing the icon on click */}
-                    <IconButton aria-label="sort-order-button" disableRipple='true' size='small' onClick={reverseSort} >
+                    <IconButton aria-label="sort-order-button" disableRipple={true} size='small' onClick={reverseSort} >
                         <Tooltip title="Order" placement="top">
                             { ascending ?
                                 <KeyboardArrowUpIcon sx={{"&:hover": { color: "#3f51b5" }}} /> :

@@ -69,7 +69,7 @@ export const getBookDetails = async(req, res) => {
             type: 'books',
             title: APIresponse.data.volumeInfo.title,
             author: APIresponse.data.volumeInfo.authors ? APIresponse.data.volumeInfo.authors[0] : null,
-            image: APIresponse.data.volumeInfo.imageLinks?.thumbnail ? APIresponse.data.volumeInfo.imageLinks?.thumbnail : null,
+            image: APIresponse.data.volumeInfo.imageLinks?.thumbnail ? APIresponse.data.volumeInfo.imageLinks?.thumbnail.replace('http:/', 'https:/') : null,
             description: APIresponse.data.volumeInfo.description,
             release_date: APIresponse.data.volumeInfo.publishedDate,
             released: APIresponse.data.volumeInfo.publishedDate ? new Date(APIresponse.data.volumeInfo.publishedDate).getTime() < new Date().getTime() : false,

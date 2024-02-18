@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext, memo } from "react";
-import { useSelector } from "react-redux";
 import { Typography, FormControl, Rating, Slider, Stack, InputAdornment, OutlinedInput, FormHelperText, InputLabel, Select, MenuItem } from '@mui/material';
 import { types, statusNames, LibraryContext } from "./Library";
 
@@ -40,7 +39,7 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
         setProgress(e.target.value === '' ? 0 : Number(e.target.value));
         if (media.seasons) {
             const currentSeason = media.seasons.findLast(season => {
-                return season[1] <= progress;
+                return season[1] <= e.target.value;
             })
             setProgressSeasons(currentSeason ? currentSeason[0] : 0);
         }

@@ -15,7 +15,7 @@ const SearchData = ({searchResults}) => {
                 <Grid container spacing={3} >
                     {searchResults.map(element =>
                         <Grid item key={element.id} style={{display: 'flex'}}>
-                            <SearchCard media={element} />
+                            <SearchCard key={element.id} media={element} />
                         </Grid>
                     )}
                 </Grid>

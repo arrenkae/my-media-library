@@ -1,6 +1,6 @@
 import { useState, useContext, memo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Card, Box, Stack, CardActions, CardContent, CardMedia, IconButton, Tooltip, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button, LinearProgress, linearProgressClasses, styled } from '@mui/material';
+import { useDispatch } from "react-redux";
+import { Card, Box, CardActions, CardContent, CardMedia, IconButton, Tooltip, Typography, Chip, Rating, Dialog, DialogActions, DialogTitle, Button, LinearProgress, linearProgressClasses, styled } from '@mui/material';
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -33,6 +33,18 @@ const LibraryCard = ({media}) => {
         }
     }
 
+    const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+        height: 10,
+        borderRadius: 5,
+        [`&.${linearProgressClasses.colorPrimary}`]: {
+          backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+        },
+        [`& .${linearProgressClasses.bar}`]: {
+          borderRadius: 5,
+          backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8',
+        },
+    }));
+    
     /* Functions for the delete confirmation dialog */
     const handleCloseConfirmation = () => {
         setOpenConfirmation(false);
@@ -52,18 +64,6 @@ const LibraryCard = ({media}) => {
         setOpenConfirmation(true);
     }
 
-    const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-        height: 10,
-        borderRadius: 5,
-        [`&.${linearProgressClasses.colorPrimary}`]: {
-          backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
-        },
-        [`& .${linearProgressClasses.bar}`]: {
-          borderRadius: 5,
-          backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8',
-        },
-    }));
-    
     const renderLibraryCard = 
         <Card sx={{ maxWidth: 200, display: 'flex', flexDirection: 'column', justifyContent:'space-between' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems:'center' }}>
@@ -97,7 +97,7 @@ const LibraryCard = ({media}) => {
                 <Typography variant="body2" color="text.secondary" sx={{mt: 2}}>
                         {media.progress} / {media.progress_max} {types[type]?.progress}
                 </Typography>
-                <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={media.rating} precision={0.5} readOnly />
+                <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={Number(media.rating)} precision={0.5} readOnly />
             </CardContent >
             <CardActions sx={{ display: 'flex', justifyContent:'flex-end' }}>
                 <Tooltip title="Edit" placement="top">

@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef, useContext, memo } from "react";
+import { useEffect, useState, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-import { Modal, Box, Stack, Typography, Fab, OutlinedInput, InputLabel, InputAdornment, FormHelperText, MenuItem, FormControl, Select, Rating, Slider, Tooltip } from '@mui/material';
+import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import axios from "axios";
 import parse from 'html-react-parser';
@@ -46,7 +46,7 @@ const Details = (props) => {
         try {
             const response = await axios.get(`${BASE_URL}/details/${type}/${detailsFetchId}`);
             if (response.status === 200) {
-                const existingMedia = fullLibrary.find(element => element.api_id == detailsFetchId && element.type == type);
+                const existingMedia = fullLibrary.find(element => element.api_id == detailsFetchId && element.type === type);
                 if (existingMedia) {
                     setMedia({...existingMedia, ...response.data.media});
                     setStatus(existingMedia.status);

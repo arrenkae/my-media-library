@@ -57,7 +57,7 @@ export const getBooks = async(req, res) => {
                     api_id: media.id,
                     title: media.volumeInfo.title,
                     author: media.volumeInfo.authors ? media.volumeInfo.authors[0] : null,
-                    image: media.volumeInfo.imageLinks?.thumbnail ? media.volumeInfo.imageLinks.thumbnail : null,
+                    image: media.volumeInfo.imageLinks?.thumbnail ? media.volumeInfo.imageLinks.thumbnail.replace('http:/', 'https:/') : null,
                 }
             })
             res.status(200).json({results});

@@ -29,7 +29,7 @@ const LibraryData = (props) => {
                 <Grid container spacing={3}>
                     {library.map(element =>
                         <Grid item key={element.id} style={{display: 'flex'}} >
-                            <LibraryCard media={element} />
+                            <LibraryCard key={element.id} media={element} />
                         </Grid>
                     )}
                 </Grid>
