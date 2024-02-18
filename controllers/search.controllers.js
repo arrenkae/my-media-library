@@ -71,3 +71,27 @@ export const getBooks = async(req, res) => {
         res.status(404).json({msg: 'Search error'});
     }
 }
+
+export const getGames = async(req, res) => {
+    const {query} = req.params;
+    try {
+        const APIresponse = await axios.get(`https://api.rawg.io/api/games?key=${process.env.GAMES_API_KEY}&search=${query}`);
+        if (APIresponse.data.results.length > 0) {
+            const results = APIresponse.data.results.map(media => {
+                return {
+                    api_id: media.id,
+                    title: media.name,
+                    /* Using cloudinary to crop and resize */
+                    image: media.background_image ?
+                    `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/fetch/ar_2:3,c_crop,g_auto,h_1.00/c_scale,h_300,w_200/${media.background_image}` : null,
+                }
+            })
+            res.status(200).json({results});
+        } else {
+            res.status(404).json({msg: `No results for ${query}`});
+        }
+    } catch (error) {
+        console.log('getGames=>', error);
+        res.status(404).json({msg: 'Search error'});
+    }
+}

@@ -110,59 +110,59 @@ const DetailsReleased = ({media, status, setStatus, progress, setProgress, ratin
                 Progress: {Math.round(progress / media.progress_max * 100)}%
             </Typography>
             {/* Slider and the number input form display the same value and if one changes the other changes as well */}
-            <Slider
-                value={progress}
-                onChange={handleProgressChange}
-                max={media.progress_max}
-                valueLabelDisplay="auto"
-                aria-labelledby="progress-slider"
-                sx={{ mb: 4, display: { xs: 'none', sm: 'flex' }}}
-                marks={
-                    media.seasons ?
-                    media.seasons.map(season => {
-                        return {
-                            value: season[1],
-                            label: 'S' + season[0]
-                        }
-                    })
-                    : null
-                }
-            />
-            <Stack spacing={1} direction={{ sm: 'column', md: 'row' }} flexDirection="flex-start" >
-                <FormControl variant="outlined">
-                    <OutlinedInput
-                        id="progress-number-input"
-                        value={progress}
-                        onChange={handleProgressChange}
-                        endAdornment={<InputAdornment position="end"> / {media.progress_max}</InputAdornment>}
-                        inputProps={{
-                        min: 0,
-                        max: media.progress_max,
-                        type: 'number',
-                        'aria-labelledby': 'input-slider',
-                        }}
-                        sx={{ maxWidth: '14ch' }}
-                    />
-                    <FormHelperText id="season-helper-text">{types[type]?.progress}</FormHelperText>
-                </FormControl>
-                {/* Only tv shows have seasons, also not displayed for shows with only 1 season since they don't need to split progress between seasons*/}
-                {
-                    media.seasons ?
-                        <FormControl variant="outlined">
-                            <OutlinedInput
-                                id="season-number-input"
-                                type="number"
-                                inputProps={{ min: 0, max: media.seasons.length }}
-                                value={progressSeasons}
-                                endAdornment={<InputAdornment position="end"> / {media.seasons.length}</InputAdornment>}
-                                onChange={handleSeasonChange}
-                                sx={{ maxWidth: '12ch' }}
-                            />
-                            <FormHelperText id="season-helper-text">seasons</FormHelperText>
-                        </FormControl>
-                    : null
-                }
-            </Stack>
+                <Slider
+                    value={progress}
+                    onChange={handleProgressChange}
+                    max={media.progress_max}
+                    valueLabelDisplay="auto"
+                    aria-labelledby="progress-slider"
+                    sx={{ mb: 4, display: { xs: 'none', sm: 'flex' }}}
+                    marks={
+                        media.seasons ?
+                        media.seasons.map(season => {
+                            return {
+                                value: season[1],
+                                label: 'S' + season[0]
+                            }
+                        })
+                        : null
+                    }
+                />
+                <Stack spacing={1} direction={{ sm: 'column', md: 'row' }} flexDirection="flex-start" >
+                    <FormControl variant="outlined">
+                        <OutlinedInput
+                            id="progress-number-input"
+                            value={progress}
+                            onChange={handleProgressChange}
+                            endAdornment={<InputAdornment position="end"> / {media.progress_max}</InputAdornment>}
+                            inputProps={{
+                            min: 0,
+                            max: media.progress_max,
+                            type: 'number',
+                            'aria-labelledby': 'input-slider',
+                            }}
+                            sx={{ maxWidth: '14ch' }}
+                        />
+                        <FormHelperText id="season-helper-text">{types[type]?.progress}</FormHelperText>
+                    </FormControl>
+                    {/* Only tv shows have seasons, also not displayed for shows with only 1 season since they don't need to split progress between seasons*/}
+                    {
+                        media.seasons ?
+                            <FormControl variant="outlined">
+                                <OutlinedInput
+                                    id="season-number-input"
+                                    type="number"
+                                    inputProps={{ min: 0, max: media.seasons.length }}
+                                    value={progressSeasons}
+                                    endAdornment={<InputAdornment position="end"> / {media.seasons.length}</InputAdornment>}
+                                    onChange={handleSeasonChange}
+                                    sx={{ maxWidth: '12ch' }}
+                                />
+                                <FormHelperText id="season-helper-text">seasons</FormHelperText>
+                            </FormControl>
+                        : null
+                    }
+                </Stack>
         </>
     )
 };
