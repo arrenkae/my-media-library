@@ -52,7 +52,7 @@ const DetailsReleased = ({media, progress, setProgress, progress_seasons, setPro
                         }}
                         sx={{ maxWidth: '14ch' }}
                     />
-                    <FormHelperText id="season-helper-text">{types[type].progress}</FormHelperText>
+                    <FormHelperText id="season-helper-text">{types[type]?.progress}</FormHelperText>
                 </FormControl>
                 {
                     type === 'tv' ?

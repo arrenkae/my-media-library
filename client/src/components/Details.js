@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useContext, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-import { Modal, Box, Typography, Fab, InputLabel, MenuItem, FormControl, Select, CircularProgress, Tooltip } from '@mui/material';
+import { Modal, Box, Stack, Typography, Fab, OutlinedInput, InputLabel, InputAdornment, FormHelperText, MenuItem, FormControl, Select, Rating, Slider, Tooltip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import axios from "axios";
 import parse from 'html-react-parser';
@@ -33,7 +33,9 @@ const Details = (props) => {
     const [progress, setProgress] = useState(0);
     const [progress_seasons, setProgressSeasons] = useState(0);
     const [rating, setRating] = useState(0);
-    const prevProgressRef = useRef();
+    const [tempStatus, setTempStatus] = useState();
+    const [tempProgress, setTempProgress] = useState();
+    const [tempSeasons, setTempSeasons] = useState();
     
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -41,18 +43,14 @@ const Details = (props) => {
 
     useEffect(()=>{
         dispatch(setMessage());
-        fetchMedia();
+        fetchMedia()
     }, [])
 
-    /* Ref used to store previous progress value so that it doesn't get reset after switching back from completed and backlog statuses */
-    useEffect(() => {
-        /* For existing media, resets to the value from the database insead of the last input */
-        if (media?.progress) {
-            prevProgressRef.current = media.progress;
-        } else if (( progress != 0 ) && ( progress != media?.progress_max )) {
-            prevProgressRef.current = progress;
-        }
-    }, [progress])
+    useEffect(()=>{
+        if (media?.status) setTempStatus((media.status != 'completed') && (media.status != 'backlog') ? media.status : 'active');
+        if (media?.progress) setTempProgress(media.progress);
+        if (media?.progress_seasons) setTempSeasons(media.progress_seasons);
+    }, [media])
 
     const fetchMedia = async() => {
         try {
@@ -91,13 +89,12 @@ const Details = (props) => {
         .then(() => getMedia())
     }
 
-    const handleSelect = (e) => {
+    const handleStatusChange = (e) => {
         setStatus(e.target.value);
-        /* Progress is automatically set to max when selecting 'completed' and to 0 when selecting 'plan to watch/read' */
         if (e.target.value === 'completed') {
-            setProgress(media.progress_max);
-            if ( type === 'tv') {
-                setProgressSeasons(media.progress_seasons_max);
+            setProgress(media?.progress_max);
+            if ( media?.progress_seasons_max) {
+                setProgressSeasons(media?.progress_seasons_max);
             }
         } else if (e.target.value === 'backlog') {
             setProgress(0);
@@ -105,12 +102,102 @@ const Details = (props) => {
                 setProgressSeasons(0);
             }
         } else {
-            setProgress(prevProgressRef.current);
-            if ( type === 'tv') {
-                setProgressSeasons(media.progress_seasons ? media.progress_seasons : 0);
+            setProgress(tempProgress);
+            if ( type === 'tv' ) {
+                setProgressSeasons(media?.progress_seasons || tempSeasons);
             }
+            setTempStatus(status);
         }
     };
+
+    const handleProgressChange = (e) => {
+        setProgress(e.target.value === '' ? 0 : Number(e.target.value));
+        if (e.target.value == media?.progress_max) {
+            if ( media?.progress_seasons_max ) {
+                setProgressSeasons(media?.progress_seasons_max);
+            }
+            setStatus('completed');
+        } else if (e.target.value == 0) {
+            if ( media?.progress_seasons_max ) {
+                setProgressSeasons(0);
+            }
+            setStatus('backlog');
+        } else {
+            console.log(tempStatus);
+            setStatus(tempStatus);
+            setTempProgress(progress);
+        }
+    }
+
+    const handleSeasonChange = (e) => {
+        setProgressSeasons(e.target.value === '' ? 0 : Number(e.target.value));
+        if (e.target.value == media?.progress_seasons_max) {
+            setProgress(media?.progress_max);
+            setStatus('completed');
+        } else {
+            setStatus(tempStatus);
+            setTempSeasons(progress_seasons);
+        }
+    }
+
+    const DetailsReleased =
+        <>
+            <Rating
+                sx={{ m: 3 }}
+                name="rating"
+                value={rating}
+                precision={0.5}
+                onChange={(e, newValue) => {
+                    setRating(newValue);
+                }}
+            />
+            <Typography id="input-slider" gutterBottom>
+                    Progress: {Math.round(progress / media?.progress_max * 100)}%
+            </Typography>
+            {/* Slider and the number input form display the same value and if one changes the other changes as well */}
+            <Slider
+                value={progress}
+                onChange={handleProgressChange}
+                max={media?.progress_max}
+                valueLabelDisplay="auto"
+                aria-labelledby="input-slider"
+                sx={{ mb: 1, display: { xs: 'none', sm: 'flex' }}}
+            />
+            <Stack spacing={1} direction={{ sm: 'column', md: 'row' }} flexDirection="flex-start" >
+                <FormControl variant="outlined">
+                    <OutlinedInput
+                        id="progress-number-input"
+                        value={progress}
+                        onChange={handleProgressChange}
+                        endAdornment={<InputAdornment position="end"> / {media?.progress_max}</InputAdornment>}
+                        inputProps={{
+                        min: 0,
+                        max: media?.progress_max,
+                        type: 'number',
+                        'aria-labelledby': 'input-slider',
+                        }}
+                        sx={{ maxWidth: '14ch' }}
+                    />
+                    <FormHelperText id="season-helper-text">{types[type]?.progress}</FormHelperText>
+                </FormControl>
+                {
+                    type === 'tv' ?
+                        <FormControl variant="outlined">
+                            <OutlinedInput
+                                id="season-number-input"
+                                type="number"
+                                inputProps={{ min: 0, max: media?.progress_seasons_max }}
+                                value={progress_seasons}
+                                endAdornment={<InputAdornment position="end"> / {media?.progress_seasons_max}</InputAdornment>}
+                                onChange={handleSeasonChange}
+                                sx={{ maxWidth: '12ch' }}
+                            />
+                            <FormHelperText id="season-helper-text">seasons</FormHelperText>
+                        </FormControl>
+                    : null
+                }
+            </Stack>
+        </>
     
     return (
         media ? 
@@ -155,7 +242,7 @@ const Details = (props) => {
                         id="status-select"
                         value={status}
                         label="Status"
-                        onChange={handleSelect}
+                        onChange={handleStatusChange}
                         >
                         { media.released ? 
                             /* Returns status display names changing them according to type (active => watching/reading) */
@@ -165,17 +252,7 @@ const Details = (props) => {
                     </Select>
                 </FormControl>
                 {/* Progress and rating are only available for the released titles */}
-                { media.released ?
-                <DetailsReleased
-                    media={media}
-                    progress={progress}
-                    setProgress={setProgress}
-                    progress_seasons={progress_seasons}
-                    setProgressSeasons={setProgressSeasons}
-                    rating={rating}
-                    setRating={setRating}
-                    setStatus={setStatus}
-                /> : null }
+                { media.released ? DetailsReleased : null }
                 <Tooltip title="Save" placement="top">
                     <Fab color="secondary" aria-label="save" onClick={save} sx={{ position: 'absolute', bottom: 40, right: 40 }}>
                         <SaveIcon />
