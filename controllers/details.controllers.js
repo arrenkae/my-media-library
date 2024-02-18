@@ -86,3 +86,26 @@ export const getBookDetails = async(req, res) => {
         res.status(404).json({msg: 'Unable to get media data'});
     }
 }
+
+export const getGameDetails = async(req, res) => {
+    const {id} = req.params;
+    try {
+        const APIresponse = await axios.get(`https://api.rawg.io/api/games/${id}?key=${process.env.GAMES_API_KEY}`);
+        const media = {
+            api_id: APIresponse.data.id,
+            type: 'games',
+            title: APIresponse.data.name,
+            image: APIresponse.data.background_image ?
+            `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/fetch/ar_2:3,c_crop,g_auto,h_1.00/c_scale,h_300,w_200/${APIresponse.data.background_image}` : null,
+            description: APIresponse.data.description,
+            release_date: APIresponse.data.released,
+            released: APIresponse.data.released ? new Date(APIresponse.data.released).getTime() < new Date().getTime() : false,
+            /* Games don't have fixed length, so progress is tracked as percentage */
+            progress_max: 100
+        }
+        res.status(200).json({media});
+    } catch (error) {
+        console.log('getGameDetails=>', error);
+        res.status(404).json({msg: 'Unable to get media data'});
+    }
+}

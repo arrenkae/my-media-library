@@ -99,7 +99,7 @@ const LibraryCard = ({media}) => {
                 {/* Progress bar displays progress % visually, in addition to numeric value */}
                 <BorderLinearProgress variant="determinate" value={Math.round(media.progress / media?.progress_max * 100)} />
                 <Typography variant="body2" color="text.secondary" sx={{mt: 2}}>
-                        {media.progress} / {media.progress_max} {types[type]?.progress}
+                        {media.progress} { type != 'games' ? '/ ' + media.progress_max : null } {types[type]?.progress}
                 </Typography>
                 <Rating sx={{ mt: 1 }} name="rating-read" defaultValue={Number(media.rating)} precision={0.5} readOnly />
             </CardContent >

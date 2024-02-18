@@ -28,6 +28,11 @@ export const types = {
         typename: 'books',
         progress: 'pages',
         verb: 'Read'
+    },
+    games: {
+        typename: 'games',
+        progress: '% completed',
+        verb: 'Play'
     }
   }
 
@@ -123,6 +128,7 @@ const Library = ({type, search}) => {
                     <Tab label="TV" value="tv" />
                     <Tab label="Movies" value="movies" />
                     <Tab label="Books" value="books" />
+                    <Tab label="Games" value="games" />
                 </Tabs>
             </Box>
             <Stack>

@@ -52,7 +52,7 @@ const LoginRegister = ({page}) => {
                 My Media Library
             </Typography>
             <Typography id="app-description" variant="h5" color="textSecondary" sx={{display: { xs: 'none', md: 'flex' }, maxWidth: 600}} gutterBottom>
-                Create and manage your personal library of books, movies and TV shows.
+                Create and manage your personal library of TV shows, movies, books and games.
             </Typography>
             <Box component={'form'} sx={{m:2, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}} noValidate autoComplete="off">
                 <TextField

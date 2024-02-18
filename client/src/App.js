@@ -63,9 +63,11 @@ function App() {
           <Route path='/library/tv' element={<Auth><Library type={'tv'} search={false} /></Auth>} />
           <Route path='/library/movies' element={<Auth><Library type={'movies'} search={false}/></Auth>} />
           <Route path='/library/books' element={<Auth><Library type={'books'} search={false}/></Auth>} />
+          <Route path='/library/games' element={<Auth><Library type={'games'} search={false}/></Auth>} />
           <Route path='/library/tv/search' element={<Auth><Library type={'tv'} search={true}/></Auth>} />
           <Route path='/library/movies/search' element={<Auth><Library type={'movies'} search={true}/></Auth>} />
           <Route path='/library/books/search' element={<Auth><Library type={'books'} search={true}/></Auth>} />
+          <Route path='/library/games/search' element={<Auth><Library type={'games'} search={true}/></Auth>} />
         </Routes>
       </ThemeProvider>
     </div>
