@@ -31,10 +31,7 @@ const Details = (props) => {
     const [media, setMedia] = useState();
     const [status, setStatus] = useState('backlog');
     const [progress, setProgress] = useState(0);
-    const [progressSeasons, setProgressSeasons] = useState(0);
     const [rating, setRating] = useState(0);
-    const [tempStatus, setTempStatus] = useState();
-    const [tempProgress, setTempProgress] = useState();
     
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -44,11 +41,6 @@ const Details = (props) => {
         dispatch(setMessage());
         fetchMedia()
     }, [])
-
-    useEffect(()=>{
-        if (media?.status) setTempStatus((media.status != 'completed') && (media.status != 'backlog') ? media.status : 'active');
-        if (media?.progress) setTempProgress(media.progress);
-    }, [media])
 
     const fetchMedia = async() => {
         try {
@@ -60,9 +52,6 @@ const Details = (props) => {
                     setStatus(existingMedia.status);
                     setProgress(existingMedia.progress);
                     setRating(existingMedia.rating);
-                    if (existingMedia.seasons) {
-                        setProgressSeasons(existingMedia.seasons.findLast(season => season[1] <= existingMedia.progress)[0] || 0)
-                    }
                 } else {
                     setMedia(response.data.media);
                 };
@@ -87,124 +76,6 @@ const Details = (props) => {
         .then(() => getMedia())
     }
 
-    const handleStatusChange = (e) => {
-        setStatus(e.target.value);
-        if (e.target.value === 'completed') {
-            setProgress(media?.progress_max);
-            if (media?.seasons) {
-                setProgressSeasons(media?.seasons.length);
-            }
-        } else if (e.target.value === 'backlog') {
-            setProgress(0);
-            if (media?.seasons) {
-                setProgressSeasons(0);
-            }
-        } else {
-            setProgress(tempProgress);
-            setTempStatus(status);
-        }
-    };
-
-    const handleProgressChange = (e) => {
-        /* Prevents non-numeric input */
-        setProgress(e.target.value === '' ? 0 : Number(e.target.value));
-        const currentSeason = media?.seasons.findLast(season => {
-            return season[1] <= progress;
-        })
-        setProgressSeasons(currentSeason ? currentSeason[0] : 0);
-        if (e.target.value == media?.progress_max) {
-            setStatus('completed');
-        } else if (e.target.value == 0) {
-            setStatus('backlog');
-        } else {
-            setStatus(tempStatus);
-            setTempProgress(progress);
-        }
-    }
-
-    const handleSeasonChange = (e) => {
-        setProgressSeasons(e.target.value);
-        setProgress(e.target.value != 0 ? media?.seasons.find(season => season[0] == e.target.value)[1] : 0);
-        if (e.target.value == media?.seasons.length) {
-            setProgress(media?.progress_max);
-            setStatus('completed');
-        } else if (e.target.value == 0) {
-            setStatus('backlog');
-        } else {
-            setStatus(tempStatus);
-            setTempProgress(progress);
-        }
-    }
-
-    const DetailsReleased =
-        <>
-            <Rating
-                sx={{ m: 3 }}
-                name="rating"
-                value={rating}
-                precision={0.5}
-                onChange={(e, newValue) => {
-                    setRating(newValue);
-                }}
-            />
-            <Typography id="input-slider" gutterBottom>
-                    Progress: {Math.round(progress / media?.progress_max * 100)}%
-            </Typography>
-            {/* Slider and the number input form display the same value and if one changes the other changes as well */}
-            <Slider
-                value={progress}
-                onChange={handleProgressChange}
-                max={media?.progress_max}
-                valueLabelDisplay="auto"
-                aria-labelledby="progress-slider"
-                sx={{ mb: 4, display: { xs: 'none', sm: 'flex' }}}
-                marks={
-                    media?.seasons ?
-                    media.seasons.map(season => {
-                        return {
-                            value: season[1],
-                            label: 'S' + season[0]
-                        }
-                    })
-                    : null
-                }
-            />
-            <Stack spacing={1} direction={{ sm: 'column', md: 'row' }} flexDirection="flex-start" >
-                <FormControl variant="outlined">
-                    <OutlinedInput
-                        id="progress-number-input"
-                        value={progress}
-                        onChange={handleProgressChange}
-                        endAdornment={<InputAdornment position="end"> / {media?.progress_max}</InputAdornment>}
-                        inputProps={{
-                        min: 0,
-                        max: media?.progress_max,
-                        type: 'number',
-                        'aria-labelledby': 'input-slider',
-                        }}
-                        sx={{ maxWidth: '14ch' }}
-                    />
-                    <FormHelperText id="season-helper-text">{types[type]?.progress}</FormHelperText>
-                </FormControl>
-                {
-                    media?.seasons ?
-                        <FormControl variant="outlined">
-                            <OutlinedInput
-                                id="season-number-input"
-                                type="number"
-                                inputProps={{ min: 0, max: media?.seasons.length }}
-                                value={progressSeasons}
-                                endAdornment={<InputAdornment position="end"> / {media?.seasons.length}</InputAdornment>}
-                                onChange={handleSeasonChange}
-                                sx={{ maxWidth: '12ch' }}
-                            />
-                            <FormHelperText id="season-helper-text">seasons</FormHelperText>
-                        </FormControl>
-                    : null
-                }
-            </Stack>
-        </>
-    
     return (
         media ? 
         <Modal
@@ -241,24 +112,31 @@ const Details = (props) => {
                     {/* Uses html parser since descriptions from google books contain html tags */}
                     {media.description ? parse(`<p>${media.description}</p>`) : null}
                 </Typography>
-                <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
-                    <InputLabel id="status-label">Status</InputLabel>
-                    <Select
+                {/* Progress, rating and status other than backlog are only available for the released titles */}
+                { media.released ?
+                    <DetailsReleased
+                        media={media}
+                        status={status}
+                        setStatus={setStatus}
+                        progress={progress}
+                        setProgress={setProgress}
+                        rating={rating}
+                        setRating={setRating}
+                    /> :
+                    <FormControl sx={{ m: 1, mt: 2, minWidth: 120 }} size="small">
+                        <InputLabel id="status-label-unreleased">Status</InputLabel>
+                        <Select
                         labelId="status-select-label"
-                        id="status-select"
-                        value={status}
+                        id="status-select-unreleased"
+                        value={'backlog'}
                         label="Status"
-                        onChange={handleStatusChange}
                         >
-                        { media.released ? 
-                            /* Returns status display names changing them according to type (active => watching/reading) */
-                            Object.keys(statusNames).map(status => <MenuItem key={status} value={status}>{statusNames[status].replace('verb', types[type].verb)}</MenuItem>)
-                            : <MenuItem value='backlog'>{statusNames.backlog.replace('verb', types[type].verb)}</MenuItem>
-                        }
-                    </Select>
-                </FormControl>
-                {/* Progress and rating are only available for the released titles */}
-                { media.released ? DetailsReleased : null }
+                            <MenuItem key={'backlog'} value={'backlog'}>
+                                {statusNames.backlog.replace('verb', types[type].verb)}
+                            </MenuItem>
+                        </Select>
+                    </FormControl>
+                 }
                 <Tooltip title="Save" placement="top">
                     <Fab color="secondary" aria-label="save" onClick={save} sx={{ position: 'absolute', bottom: 40, right: 40 }}>
                         <SaveIcon />
