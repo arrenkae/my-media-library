@@ -3,7 +3,9 @@
 
 package-lock.json
 .env
-db.sqlite
+
+# database
+db.sqlite3
 
 # dependencies
 /client/node_modules
