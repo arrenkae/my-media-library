@@ -9,3 +9,8 @@ Create and manage your personal library for TV shows, movies, books and games
 - Media fetched from external APIs ([TMDB](https://developer.themoviedb.org/docs/getting-started) for TV and movies, [Google Books](https://developers.google.com/books) for books and [RAWG](https://rawg.io/apidocs) for games) and saved in a local database
 - Server runs on Node.js
 - React client
+
+### Commands
+
+- `npm start` to run server & client
+- `npm run knex-migrate` to update the database

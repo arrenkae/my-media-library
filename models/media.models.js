@@ -6,7 +6,7 @@ export const _getUserMedia = (user_id) => {
 
 export const _saveMedia = (media) => {
     /* If the media exists in the current user's database, updates it (including the last modified date) */
-    return db('media').insert({...media, user_update: new Date() })
+    return db('media').insert({...media, user_update: new Date(), seasons: media.seasons ? JSON.stringify(media.seasons) : null })
     .onConflict(['user_id', 'api_id', 'type'])
     .merge()
     .returning('*');
