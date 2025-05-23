@@ -16,6 +16,7 @@ users_router.get('/verify', verifytoken, (req, res) => {
 users_router.get('/token', (req, res) => {
     /* Used to get token on the page refresh to keep the user logged in */
     const token = req.cookies.token || req.headers['x-access-token'];
+    // TODO use server redirects
     if (token) {
         res.status(200).json({token});
     } else {

@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 dotenv.config();
 
+const secret = process.env.ACCESS_TOKEN_SECRET;
+
 export const register = async(req, res) => {
     const { username, password } = req.body;
 
@@ -21,31 +23,33 @@ export const register = async(req, res) => {
 }
 
 export const login = async(req, res) => {
+    // TODO try catch only for parts that can give errors
     try {
         const {username, password} = req.body;
+        // TODO only login if username & password exist and are strings
         const row = await _login(username);
-        if (row.length === 0) {
+        if (!row.length) {
             return res.status(403).json({msg: 'Username not found'});
         }
+        // TODO wtf is happening here, just check if password is string
         const match = bcrypt.compareSync(password + "", row[0].password);
+        // TODO return same error message for invalid username & password
         if (!match) return res.status(403).json({msg: 'Invalid password'});
+        // TODO protection from password bruteforcing
 
-        const secret = process.env.ACCESS_TOKEN_SECRET;
         const user = {
             id: row[0].id,
             username: row[0].username
         }
 
-        const token = jwt.sign({ user }, secret, {
-            expiresIn: '1h',
-        });
+        const token = jwt.sign({ user }, secret);
 
-        res.cookie('token', token, { httpOnly: true, maxAge: 3600000, secure: true, sameSite: "None" });
+        res.cookie('token', token, { httpOnly: true, maxAge: 3600000, secure: true, sameSite: "Strict" });
         res.status(200).json({token, user, msg: 'Login successful'});
 
     } catch (error) {
         console.log('login=>', error);
-        res.status(404).json({msg: 'Unable to login'});
+        res.status(400).json({msg: 'Unable to login'});
     }
 }
 

@@ -1,10 +1,6 @@
-import knex from 'knex';
-import dotenv from 'dotenv';
-dotenv.config();
+import postgres from 'postgres'
 
-export const db = knex({
-    client: 'sqlite3',
-    connection: {
-      filename: './db.sqlite3',
-    }
-});
+const connectionString = process.env.DATABASE_URL
+const db = postgres(connectionString)
+
+export default db
